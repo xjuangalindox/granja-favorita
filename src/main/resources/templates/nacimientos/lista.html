@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <link rel="stylesheet" th:href="@{/styles.css}">
+    <title>Nacimientos</title>
+</head>
+<body>
+    
+    <!-- Incluir el fragmento del navbar.html -->
+    <div th:replace="fragments/navbar :: layoutNavbar" ></div>
+
+    <!-- Contenedor principal con margen superior -->
+    <div class="container mt-5">
+
+        <!-- Fila centrada horizontalmente -->
+        <div class="row justify-content-center">
+
+        <!-- Título centrado y con margen inferior -->
+        <div class="col-md-12 d-flex justify-content-between align-items-center mb-3">
+            <h1>Lista de nacimientos</h1>
+        </div>
+        
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Hembra</th>
+                <th scope="col">Macho</th>
+                <th scope="col">Fecha Monta</th>
+                <th scope="col">Fecha Nacimiento</th>
+                <th scope="col">Gazapos Vivos</th>
+                <th scope="col">Gazapos Muertos</th>
+                <th scope="col">Nota</th>
+                <th scope="col">Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${listaNacimientos}"> <!--Por cada item dentro de la lista nacimientos-->
+                <th th:text="${item.id}"></th>
+                <td th:text="${item.monta.hembra.nombre}"></td>
+                <td th:text="${item.monta.macho.nombre}"></td>
+                <td th:text="${item.monta.fecha_monta}"></td>
+                <td th:text="${item.fecha_nacimiento}"></td>
+                <td th:text="${item.gazapos_vivos}"></td>
+                <td th:text="${item.gazapos_muertos}"></td>
+                <td th:text="${item.nota}"></td>
+                <td>
+                <a th:href="@{/nacimientos/editar/{id}(id=${item.id})}" class="btn btn-info">Editar</a>
+                <a th:href="@{/nacimientos/eliminar/{id}(id=${item.id})}" class="btn btn-danger">Eliminar</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        </div>
+
+    </div>
+
+</body>
+</html>

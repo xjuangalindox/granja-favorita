@@ -1,0 +1,73 @@
+package com.example.demo.services;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.example.demo.controllers.dto.ArticuloDTO;
+import com.example.demo.models.ArticuloModel;
+import com.example.demo.repositories.ArticuloRepository;
+
+@Service
+public class ArticuloServiceImpl implements IArticuloService{
+
+    @Autowired
+    private ArticuloRepository articuloRepository;
+
+    @Autowired
+    private ModelMapper modelMapper;
+
+    @Override
+    public List<ArticuloDTO> obtenerArticulos() {
+        List<ArticuloModel> listaArticulos = (List<ArticuloModel>) articuloRepository.findAll();
+        
+        //Tranformar de List<ArticuloModel> a List<ArticuloDTO>
+        return listaArticulos.stream()
+        .map(item -> modelMapper.map(item, ArticuloDTO.class))
+        .collect(Collectors.toList());    
+    }
+
+    @Override
+    public ArticuloDTO obtenerPorId(Long id) {
+        ArticuloModel articuloModel = articuloRepository.findById(id).orElse(null);
+        
+        //Tranformar de ArticuloModel a ArticuloDTO
+        return modelMapper.map(articuloModel, ArticuloDTO.class);
+    }
+
+    @Override
+    public ArticuloDTO guardarArticulo(ArticuloDTO articuloDTO) {
+        //Tranformar de ArticuloDTO a ArticuloModel
+        ArticuloModel articuloModel = modelMapper.map(articuloDTO, ArticuloModel.class);
+
+        ArticuloModel articuloModelGuardado = articuloRepository.save(articuloModel);
+
+        //Transformar de ArticuloModel a ArticuloDTO
+        return modelMapper.map(articuloModelGuardado, ArticuloDTO.class);
+    }
+
+    @Override
+    public ArticuloDTO editarArticulo(Long id, ArticuloDTO articuloDTO) {
+        //Tranformar de ArticuloDTO a ArticuloModel
+        ArticuloModel articuloModel = modelMapper.map(articuloDTO, ArticuloModel.class);
+        articuloModel.setId(id);
+
+        ArticuloModel articuloModelEditado = articuloRepository.save(articuloModel);
+
+        //Transformar de ArticuloModel a ArticuloDTO
+        return modelMapper.map(articuloModelEditado, ArticuloDTO.class);
+    }
+
+    @Override
+    public boolean eliminarArticuloPorId(Long id) {
+        if(articuloRepository.existsById(id)){
+            articuloRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
+    
+}

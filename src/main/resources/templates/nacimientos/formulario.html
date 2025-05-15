@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <title>Formulario</title>
+</head>
+<body>
+    
+    <div class="container mt-4">
+        <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-body p-4">
+                <h3 class="card-title text-center mb-4">Registrar Nacimiento</h3>
+    
+                <form th:action="@{${accion}}" th:object="${nacimientoDTO}" method="post">
+                    <div class="row">
+                        <!-- Columna izquierda: Info de la Monta -->
+                        <div class="col-md-6 border-end pe-4">
+                            <h5 class="text-secondary mb-3 text-center">📝 Detalles de la Monta</h5>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">ID Monta</label>
+                                <input type="number" class="form-control" th:field="*{monta.id}" th:value="*{monta.id}" readonly>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Fecha Monta</label>
+                                <input type="date" class="form-control" th:value="*{monta.fecha_monta}" readonly>
+                            </div>
+    
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Cantidad Montas</label>
+                                <input type="number" class="form-control" th:value="*{monta.cantidad_montas}" readonly>
+                            </div>
+    
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Nota</label>
+                                <input type="text" class="form-control" th:value="*{monta.nota}" readonly>
+                            </div>
+    
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Hembra</label>
+                                <input type="text" class="form-control" th:value="*{monta.hembra.nombre}" readonly>
+                            </div>
+    
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Macho</label>
+                                <input type="text" class="form-control" th:value="*{monta.macho.nombre}" readonly>
+                            </div>
+                        </div>
+    
+                        <!-- Columna derecha: Formulario Nacimiento -->
+                        <div class="col-md-6 ps-4">
+                            <h5 class="text-secondary mb-3 text-center">🐇 Información del Nacimiento</h5>
+    
+                            <div class="mb-3">
+                                <label for="fecha_nacimiento" class="form-label fw-bold">Fecha Nacimiento</label>
+                                <input type="date" th:field="*{fecha_nacimiento}" class="form-control" id="fecha_nacimiento" required>
+                            </div>
+    
+                            <div class="mb-3">
+                                <label for="gazapos_vivos" class="form-label fw-bold">Gazapos Vivos</label>
+                                <input type="number" th:field="*{gazapos_vivos}" class="form-control" id="gazapos_vivos" required>
+                            </div>
+    
+                            <div class="mb-3">
+                                <label for="gazapos_muertos" class="form-label fw-bold">Gazapos Muertos</label>
+                                <input type="number" th:field="*{gazapos_muertos}" class="form-control" id="gazapos_muertos" required>
+                            </div>
+    
+                            <div class="mb-3">
+                                <label for="nota" class="form-label fw-bold">Nota</label>
+                                <input type="text" th:field="*{nota}" class="form-control" id="nota">
+                            </div>
+    
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg rounded-3 shadow">Guardar Nacimiento</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

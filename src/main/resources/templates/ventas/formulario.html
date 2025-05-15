@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--Estilos Bootstrap-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <!--Iconos Bootstrap-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <script></script>
+    <title>Formulario</title>
+</head>
+<body>
+
+    <div class="container mt-5">
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white text-center">
+                <h2 class="text-center mb-4" th:text="${titulo}">Titulo</h2>
+            </div>
+
+            <div class="card-body">
+                <form id="formVenta" th:action="@{${accion}}" th:object="${ventaDTO}" method="post" enctype="multipart/form-data">
+                    <div class="row">
+
+                        <!-- COLUMNA IZQUIERDA: Datos de la venta -->
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Cliente</label>
+                                <input type="text" th:field="*{nombreCliente}" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Teléfono</label>
+                                <input type="text" th:field="*{telefono}" class="form-control">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="precio" class="form-label">Contacto</label>
+                                <select class="form-select" th:field="*{vinculoContacto}" required>
+                                    <option value="">Selecciona una opción</option>
+                                    <option value="FACEBOOK">FACEBOOK</option>
+                                    <option value="WHATSAPP">WHATSAPP</option>
+                                    <option value="FACEBOOK Y WHATSAPP">FACEBOOK Y WHATSAPP</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Fecha Entrega</label>
+                                <input class="form-control" type="datetime-local" th:field="*{fechaEntrega}" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Lugar Entrega</label>
+                                <input class="form-control" type="text" th:field="*{lugarEntrega}">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Total</label>
+                                <input class="form-control" type="number" th:field="*{totalVenta}" readonly required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Nota</label>
+                                <input class="form-control" type="text" th:field="*{nota}">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Estatus</label>
+                                <select class="form-select" th:field="*{estatus}" required>
+                                    <option value="">Selecciona una opción</option>
+                                    <option value="PENDIENTE">PENDIENTE</option>
+                                    <option value="APARTADO">APARTADO</option>
+                                    <option value="ENTREGADO">ENTREGADO</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- COLUMNA DERECHA: Artículos y ejemplares -->
+                        <div class="col-md-8">
+
+                            <!--ARTICULOS DISPONIBLES-->
+                            <h5>Artículos Disponibles</h5>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Artículo</th>
+                                        <th style="width: 100px;">Cantidad</th>
+                                        <th style="width: 100px;">Subtotal</th>
+                                        <th style="width: 50px;"></th> <!--Boton Eliminar-->
+                                    </tr>
+                                </thead>
+                                <tbody id="articulosContainer">
+                                    <!-- Filas dinámicas aqui -->
+                                </tbody>
+                            </table>
+
+                            <!--Boton Agregar Articulo-->
+                            <div class="mb-3">
+                                <button type="button" class="btn btn-success" onclick="agregarArticulo()">Agregar artículo</button>
+                            </div>
+
+                            <hr class="border border-primary border-3 opacity-75">
+
+                            <!--EJEMPLARES INFORMACION-->
+                            <h5>Nacimientos Disponibles</h5>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Imagen</th>
+                                        <th scope="col">Sexo</th>
+                                        <th style="width: 100px;">Precio</th>
+                                        <th scope="col">Nacimiento</th>
+                                        <th style="width: 50px;"></th> <!--Boton Eliminar-->
+                                    </tr>
+                                </thead>
+                                <tbody id="ejemplaresContainer">
+                                    <!-- Filas dinámicas aqui -->
+                                </tbody>
+                            </table>
+
+                            <!--Boton Agregar Ejemplar-->
+                            <div class="mb-3">
+                                <button type="button" class="btn btn-success" onclick="agregarEjemplar()">Agregar ejemplar</button>
+                            </div>
+
+                            <!-- Botón para enviar el formulario al controller-->
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Guardar Venta</button>
+                            </div>
+                        </div>
+
+                    </div>    
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- primero definimos la variable con los datos -->
+    <script th:inline="javascript">
+        let listaArticulos = /*[[${listaArticulos}]]*/ [];
+        let listaNacimientos = /*[[${listaNacimientos}]]*/ [];
+
+        let ventaArticulos = /*[[${ventaDTO.articulos}]]*/ [];
+        let ventaEjemplares = /*[[${ventaDTO.ejemplares}]]*/ [];
+        
+        //ventaArticulos = ventaArticulos || [];
+        //ventaEjemplares = ventaEjemplares || [];
+    </script>
+
+    <!-- luego cargamos el archivo que la usa -->
+    <script th:src="@{/js/venta-formulario.js}"></script>
+
+</body>
+</html>
