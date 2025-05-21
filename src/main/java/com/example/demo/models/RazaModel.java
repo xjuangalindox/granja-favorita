@@ -1,7 +1,5 @@
 package com.example.demo.models;
 
-import java.time.LocalDate;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,22 +11,16 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "conejos")
+@Table(name = "razas")
 @NoArgsConstructor
 @AllArgsConstructor
-@Setter
 @Getter
-public class ConejoModel {
+@Setter
+public class RazaModel {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-
-	private String nombre;
-	private String imagen;
-	private String raza; 
-	private Double peso;
-	private String sexo;
-	private boolean salud;
-	private LocalDate fechaNacimiento;
+    private String nombre;
 }
