@@ -1,6 +1,7 @@
 package com.example.demo.services;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,6 +52,7 @@ public class ConejoServiceImpl implements IConejoService{
     @Override
     public List<ConejoDTO> obtenerConejos() {
         List<ConejoModel> entitiesList = (List<ConejoModel>) conejoRepository.findAll();
+        entitiesList.sort(Comparator.comparing(item -> item.getNombre()));
 
         // Conversion entitiesList a dtosList
         List<ConejoDTO> dtosList = entitiesList.stream()
@@ -75,11 +77,10 @@ public class ConejoServiceImpl implements IConejoService{
         //Conversion de ConejoDTO a ConejoModel
         ConejoModel conejoModel = modelMapper.map(conejoDTO, ConejoModel.class);
         // Guardar conejo
-        ConejoModel conejoModelGuardado = conejoRepository.save(conejoModel);
-        //Conversion de ConejoModel a ConejoDTO
-        ConejoDTO conejoDTOGuardado = modelMapper.map(conejoModelGuardado, ConejoDTO.class);
-        
-        return conejoDTOGuardado;
+        ConejoModel guardado = conejoRepository.save(conejoModel);
+
+        // Retornar ConejoDTO guardado
+        return modelMapper.map(guardado, ConejoDTO.class);
     }
 
     @Override
@@ -90,11 +91,10 @@ public class ConejoServiceImpl implements IConejoService{
         // Conversion de ConejoDTO a ConejoModel
         ConejoModel conejoModel = modelMapper.map(conejoDTO, ConejoModel.class);
         // Guardar modificacion
-        ConejoModel conejoModelModificado = conejoRepository.save(conejoModel);
-        // Conversion de ConejoModel a ConejoDTO
-        ConejoDTO conejoDTOModificado = modelMapper.map(conejoModelModificado, ConejoDTO.class);
+        ConejoModel guardado = conejoRepository.save(conejoModel);
 
-        return conejoDTOModificado;
+        // Retornar ConejoDTO guardado
+        return modelMapper.map(guardado, ConejoDTO.class);
     }
 
     @Override

@@ -10,59 +10,54 @@
     
     <div class="container mt-5" style="max-width: 600px;">
         <div class="card shadow-lg">
-            <div class="card-header bg-primary text-white text-center">
 
+            <div class="card-header bg-primary text-white text-center">
                 <!-- Título centrado y con margen inferior -->
                 <h2 class="text-center mb-4" th:text="${titulo}">Titulo</h2>
-
             </div>
+            
             <div class="card-body">
 
-<!-- Mensaje informativo -->
-<div th:if="${mensaje}" class="alert alert-warning" role="alert">
-    <span th:text="${mensaje}"></span>
-</div>
+                <!-- Mensaje Danger -->
+                <div th:if="${mensaje}" class="alert alert-danger text-center" role="alert">
+                    <span th:text="${mensaje}"></span>
+                </div>
 
-                <!-- Formulario para crear un nuevo conejo -->
+                <!-- Formulario -->
                 <form th:action="@{${accion}}" th:object="${conejoDTO}" method="post" enctype="multipart/form-data">
 
-                    <!-- Campo de texto para el nombre del conejo -->
+                    <!-- inputs ocultos -->
+                    <input type="hidden" th:field="*{nombreImagen}"/>
+                    <input type="hidden" th:field="*{totalNacimientos}"/>
+                    <input type="hidden" th:field="*{totalGazapos}"/>
+
+                    <!-- Previsualización para imagen -->
+                    <div class="form-group text-center">
+                        <img id="preview" 
+                            th:src="@{/img/conejos/{img}(img=${conejoDTO.nombreImagen})}" 
+                            class="img-thumbnail mx-auto d-block mb-2"
+                            style="max-width: 200px; max-height: 200px; object-fit: cover;">    
+                    </div>
+
+                    <!-- nombre -->
                     <div class="mb-3">
                         <label for="nombre" class="form-label">Nombre</label>
                         <input type="text" th:field="*{nombre}" class="form-control" id="nombre" required>
                     </div>
 
-                    <!-- Imagen actual (solo mostrar si existe imagen) -->
-                    <div th:if="${conejoDTO.imagen != null}" class="form-group text-center">
-                        <label>Imagen actual:</label><br>
-                        <img th:src="@{/img/conejos/{img}(img=${conejoDTO.imagen})}" width="150px" class="mb-2"/>
-                    </div>
-
-                    <!-- Campo para subir la imagen (crear) -->
+                    <!-- Imagen obligatoria (crear) -->
                     <div class="mb-3" th:if="${conejoDTO.id == null}">
                         <label for="imagen" class="form-label">Imagen</label>
                         <input type="file" th:field="*{imagen}" class="form-control" id="imagen" name="imagen" accept="image/*" required>
                     </div>
                     
-                    <!-- Campo para subir la imagen (editar) -->
+                    <!-- Imagen opcional (editar) -->
                     <div class="mb-3" th:if="${conejoDTO.id != null}">
                         <label for="imagen" class="form-label">Imagen</label>
                         <input type="file" th:field="*{imagen}" class="form-control" id="imagen" name="imagen" accept="image/*">
                     </div>
 
-                    <!-- Campo de texto para la raza del conejo -->
-                    <div class="mb-3">
-                        <label for="raza" class="form-label">Raza</label>
-                        <input type="text" th:field="*{raza}" class="form-control" id="raza" required>
-                    </div>
-                    
-                    <!-- Campo numérico para el peso del conejo -->
-                    <div class="mb-3">
-                        <label for="peso" class="form-label">Peso (kg.g)</label>
-                        <input type="number" th:field="*{peso}" class="form-control" id="peso" step="0.001">
-                    </div>
-                    
-                    <!-- Selector para elegir el sexo del conejo -->
+                    <!-- Sexo (select) -->
                     <div class="mb-3">
                         <label for="sexo" class="form-label">Sexo</label>
                         <select th:field="*{sexo}" class="form-select" id="sexo" required>
@@ -71,11 +66,40 @@
                             <option value="Hembra">Hembra</option>
                         </select>
                     </div>
-                    
-                    <!-- Campo de texto para el estado de salud del conejo -->
+
+                    <!-- Raza (select) -->
                     <div class="mb-3">
-                        <label for="salud" class="form-label">Salud</label>
-                        <input type="text" th:field="*{salud}" class="form-control" id="salud" required>
+                        <label for="raza" class="form-label">Raza</label>
+                        <select th:field="*{raza.id}" class="form-select" id="raza" required>
+                            <option value="">Selecciona una opción</option>
+                            <option th:each="item : ${listaRazas}" 
+                                    th:value="${item.id}" 
+                                    th:text="${item.nombre}">
+                            </option>
+                        </select>
+                    </div>
+                    
+                    <!-- Peso -->
+                    <div class="mb-3">
+                        <label for="peso" class="form-label">Peso (kg.g)</label>
+                        <input type="number" th:field="*{peso}" class="form-control" id="peso" step="0.001" min="0">
+                    </div>
+                    
+                    <!-- Fecha de nacimiento -->
+                    <div class="mb-3">
+                        <label for="fechaNacimiento" class="form-label">Fecha Nacimeinto</label>
+                        <input type="date" th:field="*{fechaNacimiento}" class="form-control" id="fechaNacimiento">
+                    </div>
+
+                    <!-- Activo (booleano) -->
+                    <div class="mb-3 text-center">
+                        <label for="activo" class="form-label">¿Se encuentra activo?</label>
+                        <input type="checkbox" th:field="*{activo}" class="form-check-input" id="activo">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="nota" class="form-label">Nota</label>
+                        <textArea th:field="*{nota}" class="form-control" id="nota" rows="3" maxlength="500"></textArea>
                     </div>
                     
                     <!-- Botón para enviar el formulario -->
@@ -88,6 +112,26 @@
             </div>
         </div>
     </div>
+
+    <!-- Script para mostrar vista previa -->
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const inputImagen = document.getElementById("imagen");
+        const preview = document.getElementById("preview");
+
+        inputImagen.addEventListener("change", function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = "block";
+            };
+            reader.readAsDataURL(file);
+        }
+        });
+    });
+    </script>
 
 </body>
 </html>
