@@ -112,6 +112,7 @@ public class ConejoServiceImpl implements IConejoService{
     @Override
     public List<ConejoDTO> obtenerConejosPorSexo(String sexo) {
         List<ConejoModel> entitiesList = conejoRepository.findBySexoIgnoreCase(sexo);
+        entitiesList.sort(Comparator.comparing(item -> item.getNombre()));
 
         List<ConejoDTO> dtosList = entitiesList.stream()
         .map(item -> modelMapper.map(item, ConejoDTO.class))

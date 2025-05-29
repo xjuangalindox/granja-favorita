@@ -1,5 +1,6 @@
 package com.example.demo.services;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,18 +28,19 @@ public class MontaServiceImpl implements IMontaService{
     @Override
     public List<MontaDTO> obtenerMontas() {
         List<MontaModel> entitiesList = (List<MontaModel>) montaRepository.findAll();
+        entitiesList.sort(Comparator.comparing(item -> item.getFechaMonta()));
 
         // Conversion de List<MontaModel> a List<MontaDTO>
         List<MontaDTO> dtosList = entitiesList.stream()
         .map(item -> modelMapper.map(item, MontaDTO.class))
         .collect(Collectors.toList());
 
-        for(MontaDTO item : dtosList){
+        /*for(MontaDTO item : dtosList){
             //  Existe nacimiento por MontaModel - Conversion de MontaDTO a MontaModel
             boolean nacimiento = nacimientoRepository.existsByMonta(modelMapper.map(item, MontaModel.class));
             //  Asignar true o false a "tieneNacimiento"
             item.setTieneNacimiento(nacimiento);
-        }
+        }*/
 
         // Retornar montas con valor en "tieneNacimiento"
         return dtosList;
@@ -87,6 +89,11 @@ public class MontaServiceImpl implements IMontaService{
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean existsById(Long id) {
+        return montaRepository.existsById(id);
     }
     
 }

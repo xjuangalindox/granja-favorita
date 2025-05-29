@@ -1,5 +1,6 @@
 package com.example.demo.controllers.dto;
 
+
 import java.time.LocalDate;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -24,34 +25,27 @@ public class MontaDTO {
 
 	private Long id;
 
-	@NotNull
-	@PastOrPresent
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	@Column(nullable = false)
-	private LocalDate fecha_monta;
-
-	@NotNull
-	@PositiveOrZero
-	@Max(value = 10)
-	@Column(nullable = false)
-	private int cantidad_montas;
-
 	@Size(min = 0, max = 50)
 	private String nota;
 
-	@NotNull
+	@PastOrPresent(message = "La fecha no puede ser futura")
+	@DateTimeFormat(pattern = "yyyy-MM-dd") // Necesario para manejar un solo formaro en el frontend
+	private LocalDate fechaMonta;
+
+	@PositiveOrZero
+	@Max(value = 10)
+	private Integer cantidadMontas;
+
 	private EstatusMonta estatus;
 
 	// ✅ Campo auxiliar para vista (no se guarda en DB)
-	private boolean tieneNacimiento;
+	//private boolean tieneNacimiento;
 	
 	// Relacion con ConejoDTO
 	
-	@NotNull
 	@Valid
 	private ConejoDTO hembra;
 
-	@NotNull
 	@Valid
 	private ConejoDTO macho;
 }

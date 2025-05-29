@@ -20,4 +20,6 @@ public interface IMontaService {
 
     // Eliminar monta por id
     public boolean eliminarMontaById(Long id);
+
+    public boolean existsById(Long id);
 }

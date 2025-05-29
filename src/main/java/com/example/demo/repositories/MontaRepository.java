@@ -7,5 +7,5 @@ import com.example.demo.models.MontaModel;
 
 @Repository
 public interface MontaRepository extends CrudRepository<MontaModel, Long> {
-	
+	boolean existsById(Long id);
 }

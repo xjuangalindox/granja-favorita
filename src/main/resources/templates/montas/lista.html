@@ -18,6 +18,11 @@
         <!-- Fila centrada horizontalmente -->
         <div class="row justify-content-center">
 
+        <!-- Mensaje Success -->
+        <div th:if="${mensaje}" class="alert alert-success text-center" role="alert">
+            <span th:text="${mensaje}"></span>
+        </div>
+
         <!-- Título centrado y con margen inferior -->
         <div class="col-md-12 d-flex justify-content-between align-items-center mb-3">
             <h1>Lista de montas</h1>
@@ -26,39 +31,64 @@
         
         <table class="table">
             <thead>
-            <tr>
-                <th scope="col">ID</th>
-                <th scope="col">Fecha Monta</th>
-                <th scope="col">Cantidad Montas</th>
-                <th scope="col">Estatus</th>
-                <th scope="col">Nota</th>
-                <th scope="col">Hembra</th>
-                <th scope="col">Macho</th>
-                <th scope="col">Acciones</th>
-                <th scope="col">Nacimiento</th>
-            </tr>
+                <tr class="text-center">
+                    <th scope="col">Macho</th>
+                    <th scope="col">Hembra</th>
+                    <th scope="col">Fecha Monta</th>
+                    <th scope="col">Cantidad Montas</th>
+                    <th scope="col">Nota</th>
+                    <th scope="col">Acciones</th>
+                    <th scope="col">Nacimiento</th>
+                </tr>
             </thead>
             <tbody>
-            <tr th:each="item : ${listaMontas}" th:classappend="${item.estatus.name == 'EFECTIVA'} ? 'table-success' :
-            (${item.estatus.name == 'ACEPTABLE'} ? 'table-warning' :
-            (${item.estatus.name == 'MALA'} ? 'table-danger' : ''))">
-                
-                <th th:text="${item.id}"></th>
-                <td th:text="${item.fecha_monta}"></td>
-                <td th:text="${item.cantidad_montas}"></td>
-                <td th:text="${item.estatus}"></td>
-                <td th:text="${item.nota}"></td>
-                <td th:text="${item.hembra.nombre}"></td>
-                <td th:text="${item.macho.nombre}"></td>
-                <td>
-                    <a th:href="@{/montas/editar/{id}(id=${item.id})}" class="btn btn-info">Editar</a>
-                    <a th:href="@{/montas/eliminar/{id}(id=${item.id})}" class="btn btn-danger">Eliminar</a>
-                </td>
-                <td>
-                    <a th:if="${item.tieneNacimiento == true}" th:href="@{/nacimientos/por-monta/{idMonta}(idMonta=${item.id})}" class="btn btn-secondary">Mostrar</a>
-                    <a th:if="${item.tieneNacimiento == false}" th:href="@{/nacimientos/crear/{id}(id=${item.id})}" class="btn btn-success">Registrar</a>
-                </td>
-            </tr>
+                <tr class="text-center align-middle" th:each="item : ${listaMontas}" th:classappend=
+                    "${item.estatus.name == 'EFECTIVA'} ? 'table-success' :
+                    (${item.estatus.name == 'ACEPTABLE'} ? 'table-warning' :
+                    (${item.estatus.name == 'MALA'} ? 'table-danger' : ''))">
+                    
+                    <td>
+                        <div>
+                            <span th:text="${item.macho.nombre}"></span>
+                        </div>
+                        <div>
+                            <a th:href="@{/img/conejos/{img}(img=${item.macho.nombreImagen})}" target="_blank">
+                                <img
+                                th:src="@{/img/conejos/{img}(img = ${item.macho.nombreImagen})}" 
+                                class="img-thumbnail"
+                                style="max-width: 100px; max-height: 100px; object-fit: cover;" 
+                                alt="Imagen del conejo macho">
+                            </a>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <span th:text="${item.hembra.nombre}"></span>
+                        </div>
+                        <div>
+                            <a th:href="@{/img/conejos/{img}(img=${item.hembra.nombreImagen})}" target="_blank">
+                                <img
+                                th:src="@{/img/conejos/{img}(img = ${item.hembra.nombreImagen})}" 
+                                class="img-thumbnail"
+                                style="max-width: 100px; max-height: 100px; object-fit: cover;" 
+                                alt="Imagen del conejo hembra">
+                            </a>
+                        </div>
+                    </td>
+
+                    <td th:text="${#temporals.format(item.fechaMonta, 'dd/MMMM/yyyy')}"></td>
+                    <td th:text="${item.cantidadMontas}"></td>
+                    <td th:text="${item.nota}"></td>
+                    <td>
+                        <a th:href="@{/montas/editar/{id}(id=${item.id})}" class="btn btn-info">Editar</a>
+                        <a th:href="@{/montas/eliminar/{id}(id=${item.id})}" class="btn btn-danger" 
+                            onclick="return confirm('¿Seguro que deseas eliminar esta monta?')">Eliminar</a>
+                    </td>
+                    <td>
+                        <!--<a th:if="${item.tieneNacimiento == true}" th:href="@{/nacimientos/por-monta/{idMonta}(idMonta=${item.id})}" class="btn btn-secondary">Mostrar</a>--> 
+                        <!--<a th:if="${item.tieneNacimiento == false}" th:href="@{/nacimientos/crear/{id}(id=${item.id})}" class="btn btn-success">Registrar</a>--> 
+                    </td>
+                </tr>
             </tbody>
         </table>
 

@@ -3,7 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <!-- CSS -->
+    <link rel="stylesheet" th:href="@{/styles.css}">
+    <!-- jQuery y Select2 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <title>Formulario</title>
 </head>
 <body>
@@ -20,48 +28,30 @@
                 <!-- Título centrado y con margen inferior -->
                 <h2 class="text-center mb-4" th:text="${titulo}">Titulo</h2>
                 
+                <!-- Mensaje Danger -->
+                <div th:if="${mensaje}" class="alert alert-danger text-center" role="alert">
+                    <span th:text="${mensaje}"></span>
+                </div>
+
+                <!-- Errores de MontaDTO -->
+                 <div th:if="${errores}" class="alert alert-danger">
+                    <ul class="mb-0 ps-4">
+                        <li th:each="e : ${errores}" th:text="${e}"></li>
+                    </ul>
+                 </div>
+                
                 <!-- Formulario para crear un nuevo conejo -->
                 <form th:action="@{${accion}}" th:object="${montaDTO}" method="post">
-                    
-                    <!-- Campo date para la fecha de la monta -->
-                    <div class="mb-3">
-                        <label for="fecha_monta" class="form-label">Fecha Monta</label>
-                        <input type="date" th:field="*{fecha_monta}" class="form-control" id="fecha_monta" required>
-                    </div>
-                    
-                    <!-- Campo númerico para la cantidad de montas -->
-                    <div class="mb-3">
-                        <label for="cantidad_montas" class="form-label">Cantidad Montas</label>
-                        <input type="number" th:field="*{cantidad_montas}" class="form-control" id="cantidad_montas" step="1" required>
-                    </div>
-                    
-                    <!-- Selecctor con lista de conejos hembras -->
-                    <div class="mb-3">
-                        <label for="estatus" class="form-label">Estatus Monta</label>
-                        <select class="form-select" th:field="*{estatus}" required>
-                            <option value="" selected>Selecciona una opción</option>
-                            <option th:each="item : ${listaEstatus}"
-                                    th:value="${item}"
-                                    th:text="${item}">
-                            </option>
-                        </select>
-                    </div>
 
-                    <!-- Campo de texto para la nota de la monta -->
-                    <div class="mb-3">
-                        <label for="nota" class="form-label">Nota</label>
-                        <input type="text" th:field="*{nota}" class="form-control" id="nota">
-                    </div>
-                            
                     <!-- Selecctor con lista de conejos hembras -->
                     <div class="mb-3">
                         <label for="hembra" class="form-label">Hembra</label>
-                        <select class="form-select" th:field="*{hembra.id}" required>
-                            <option value="" selected>Selecciona una hembra</option>
+                        <select id="hembra" class="form-select" th:field="*{hembra.id}" required>
+                            <option value="">Selecciona una hembra</option>
                             <option th:each="coneja : ${listaHembras}"
                                     th:value="${coneja.id}"
-                                    th:text="${coneja.nombre}"
-                                    th:selected="${coneja.id == montaDTO.hembra.id}">
+                                    th:data-img="@{/img/conejos/{img}(img = ${coneja.nombreImagen})}"
+                                    th:text="${coneja.nombre}">
                             </option>
                         </select>
                     </div>
@@ -69,14 +59,44 @@
                     <!-- Selecctor con lista de conejos machos -->
                     <div class="mb-3">
                         <label for="macho" class="form-label">Macho</label>
-                        <select class="form-select" th:field="*{macho.id}" required>
-                            <option value="" selected>Selecciona un macho</option>
+                        <select id="macho" class="form-select" th:field="*{macho.id}" required>
+                            <option value="">Selecciona un macho</option>
                             <option th:each="conejo : ${listaMachos}"
                                     th:value="${conejo.id}"
-                                    th:text="${conejo.nombre}"
-                                    th:selected="${conejo.id == montaDTO.macho.id}">
+                                    th:data-img="@{/img/conejos/{img}(img = ${conejo.nombreImagen})}"
+                                    th:text="${conejo.nombre}">
                             </option>
                         </select>
+                    </div>
+
+                    <!-- Campo date para la fecha de la monta -->
+                    <div class="mb-3">
+                        <label for="fechaMonta" class="form-label">Fecha Monta</label>
+                        <input id="fechaMonta" class="form-control" type="date" th:field="*{fechaMonta}" required>
+                    </div>
+                    
+                    <!-- Campo númerico para la cantidad de montas -->
+                    <div class="mb-3">
+                        <label for="cantidadMontas" class="form-label">Cantidad Montas</label>
+                        <input id="cantidadMontas" class="form-control" type="number" th:field="*{cantidadMontas}" min="0" max="10" step="1" required>
+                    </div>
+                    
+                    <!-- Selecctor con lista de conejos hembras -->
+                    <div class="mb-3">
+                        <label for="estatus" class="form-label">Estatus Monta</label>
+                        <select id="estatus" class="form-select" th:field="*{estatus}" required>
+                            <option value="">Selecciona una opción</option>
+                            <option th:each="item : ${listaEstatus}"
+                                    th:value="${item}"
+                                    th:text="${item}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Nota -->
+                    <div class="mb-3">
+                        <label for="nota" class="form-label">Nota</label>
+                        <textArea id="nota" class="form-control" th:field="*{nota}" rows="3" maxlength="500"></textArea>
                     </div>
 
                     <!-- Botón para enviar el formulario -->
@@ -88,6 +108,31 @@
             </div>
         </div>
     </div>
+
+    <script>
+    $(document).ready(function() {
+        // Aplica Select2 a ambos selects
+        $('#hembra, #macho').select2({
+        templateResult: formatOption,
+        templateSelection: formatOption,
+        minimumResultsForSearch: -1 // Oculta el buscador si no quieres filtro
+        });
+
+        function formatOption(state) {
+        if (!state.id) return state.text;
+
+        const imgUrl = $(state.element).data('img');
+        const name = state.text;
+
+        return $(`
+            <div class="option-wrapper">
+            <img src="${imgUrl}" class="img-select" />
+            <span>${name}</span>
+            </div>
+        `);
+        }
+    });
+    </script>
 
 </body>
 </html>
