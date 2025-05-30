@@ -7,10 +7,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import com.example.demo.models.enums.EstatusMonta;
 
-import jakarta.persistence.Column;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;

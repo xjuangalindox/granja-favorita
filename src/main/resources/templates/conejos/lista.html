@@ -19,8 +19,13 @@
     <div class="row justify-content-center">
 
       <!-- Mensaje Success -->
-      <div th:if="${mensaje}" class="alert alert-success text-center" role="alert">
-          <span th:text="${mensaje}"></span>
+      <div th:if="${ok}" class="alert alert-success text-center" role="alert">
+          <span th:text="${ok}"></span>
+      </div>
+
+      <!-- Mensaje Danger -->
+      <div th:if="${error}" class="alert alert-danger text-center" role="alert">
+          <span th:text="${error}"></span>
       </div>
 
       <div class="col-md-12 mb-3">
@@ -67,7 +72,7 @@
 
             <td th:text="${item.raza.nombre}"></td>
             <td th:text="${item.peso}"></td>
-            <td th:text="${item.fechaNacimiento}"></td>
+            <td th:text="${#temporals.format(item.fechaNacimiento, 'dd/MMMM/yyyy')}"></td>
             <td th:text="${item.totalNacimientos}"></td>
             <td th:text="${item.totalGazapos}"></td>
             <td th:text="${item.activo}"></td>

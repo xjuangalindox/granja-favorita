@@ -89,7 +89,7 @@ public class ConejoController {
 		}
 
 		conejoService.guardarConejo(conejoDTO);
-		redirectAttributes.addFlashAttribute("mensaje", "Conejo registrado correctamente.");
+		redirectAttributes.addFlashAttribute("ok", "Conejo registrado correctamente.");
 		return "redirect:/conejos";
 	}
 
@@ -187,7 +187,7 @@ public class ConejoController {
 		}
 
 		conejoService.editarConejo(id, conejoDTO);
-		redirectAttributes.addFlashAttribute("mensaje", "Conejo modificado correctamente.");
+		redirectAttributes.addFlashAttribute("ok", "Conejo modificado correctamente.");
 		return "redirect:/conejos";
 	}
 
@@ -196,20 +196,23 @@ public class ConejoController {
 	
 	@GetMapping("/conejos/eliminar/{id}")
 	public String eliminarConejo(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
-		ConejoDTO conejoDTO = conejoService.obtenerConejoById(id);
-		Path ruta = ArchivoUtil.crearRuta(RUTA_CONEJOS, conejoDTO.getNombreImagen());
+		if(conejoService.existsById(id)){
+			ConejoDTO conejoDTO = conejoService.obtenerConejoById(id);
+			Path ruta = ArchivoUtil.crearRuta(RUTA_CONEJOS, conejoDTO.getNombreImagen());
 
-		try {
-			Files.deleteIfExists(ruta);
+			try {
+				conejoService.eliminarConejoById(id);
+				Files.deleteIfExists(ruta);
+				redirectAttributes.addFlashAttribute("ok", "Conejo eliminado correctamente.");
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			model.addAttribute("mensaje", "Error al intenter eliminar la imagen en el proyecto.");
-			return "conejos/lista";
+			} catch (Exception e) {
+				redirectAttributes.addFlashAttribute("error", "Ocurrió un error al eliminar el conejo.");
+			}
+
+		}else{
+			redirectAttributes.addFlashAttribute("error", "El conejo con ID "+id+" no fue encontrado.");
 		}
 
-		conejoService.eliminarConejoById(id);
-		redirectAttributes.addFlashAttribute("mensaje", "Conejo eliminado correctamente.");
 		return "redirect:/conejos";
 	}
 }

@@ -28,4 +28,6 @@ public interface IConejoService {
 
     public boolean existsByNombre(String nombre);
 
+    public boolean existsById(Long id);
+
 }

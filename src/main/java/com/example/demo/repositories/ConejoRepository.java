@@ -20,5 +20,7 @@ public interface ConejoRepository extends CrudRepository<ConejoModel, Long> {
 	List<ConejoModel> findByNombreContainingIgnoreCaseAndSexoIgnoreCase(String nombre, String sexo);
 
 	boolean existsByNombre(String nombre);
+
+	boolean existsById(Long id);
 	
 }

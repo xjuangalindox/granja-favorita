@@ -2,6 +2,7 @@ package com.example.demo.controllers.dto;
 
 import java.time.LocalDate;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.AllArgsConstructor;
@@ -22,7 +23,10 @@ public class ConejoDTO {
 	private String nota;
 
 	private String nombreImagen;
+
+	@DateTimeFormat(pattern = "yyyy-MM-dd") // Necesario para manejar un solo formaro en el frontend
 	private LocalDate fechaNacimiento;
+	
 	private Integer totalNacimientos;
 	private Integer totalGazapos;
 

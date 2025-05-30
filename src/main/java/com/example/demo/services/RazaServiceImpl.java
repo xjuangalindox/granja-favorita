@@ -1,5 +1,6 @@
 package com.example.demo.services;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,6 +26,7 @@ public class RazaServiceImpl implements IRazaService{
     @Override
     public List<RazaDTO> obtenerRazas() {
         List<RazaModel> listaRazas = (List<RazaModel>) razaRepository.findAll();
+        listaRazas.sort(Comparator.comparing(item -> item.getNombre()));
 
         return listaRazas.stream()
                 .map(item -> modelMapper.map(item, RazaDTO.class))

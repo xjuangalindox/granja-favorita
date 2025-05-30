@@ -126,6 +126,8 @@ public class ConejoServiceImpl implements IConejoService{
         return conejoRepository.existsByNombre(nombre);
     }
 
-
-
+    @Override
+    public boolean existsById(Long id) {
+        return conejoRepository.existsById(id);
+    }
 }
