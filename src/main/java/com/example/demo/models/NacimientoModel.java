@@ -2,7 +2,7 @@ package com.example.demo.models;
 
 import java.time.LocalDate;
 
-import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,13 +27,18 @@ public class NacimientoModel {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private LocalDate fecha_nacimiento;
-	private int gazapos_vivos;
-	private int gazapos_muertos;
+	@Column(name = "fecha_nacimiento")
+	private LocalDate fechaNacimiento;
+
+	@Column(name = "gazapos_vivos")
+	private Integer gazaposVivos;
+
+	@Column(name = "gazapos_muertos")
+	private Integer gazaposMuertos;
+
 	private String nota;
 
 	// Relacion con MontaModel
-
 	@OneToOne(targetEntity = MontaModel.class)
 	@JoinColumn(name = "id_monta")
 	private MontaModel monta;

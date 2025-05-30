@@ -14,4 +14,6 @@ public interface NacimientoRepository extends CrudRepository<NacimientoModel, Lo
     boolean existsByMonta(MontaModel monta);
 
     Optional<NacimientoModel> findByMonta(MontaModel montaModel);
+
+    boolean existsById(Long id);
 }

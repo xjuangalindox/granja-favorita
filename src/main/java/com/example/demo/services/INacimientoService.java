@@ -23,4 +23,6 @@ public interface INacimientoService {
 
     // Eliminar monta por id
     public boolean eliminarNacimientoById(Long id);
+
+    public boolean existsById(Long id);
 }

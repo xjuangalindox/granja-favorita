@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.example.demo.controllers.dto.ConejoDTO;
 import com.example.demo.controllers.dto.MontaDTO;
 import com.example.demo.models.enums.EstatusMonta;
 import com.example.demo.services.IConejoService;

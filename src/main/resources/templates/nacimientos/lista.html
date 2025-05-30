@@ -18,18 +18,27 @@
         <!-- Fila centrada horizontalmente -->
         <div class="row justify-content-center">
 
+        <!-- Mensaje Success -->
+        <div th:if="${ok}" class="alert alert-success text-center" role="alert">
+            <span th:text="${ok}"></span>
+        </div>
+
+        <!-- Mensaje Danger -->
+        <div th:if="${error}" class="alert alert-danger text-center" role="alert">
+            <span th:text="${error}"></span>
+        </div>
+
         <!-- Título centrado y con margen inferior -->
         <div class="col-md-12 d-flex justify-content-between align-items-center mb-3">
             <h1>Lista de nacimientos</h1>
+            <a th:href="@{/nacimientos/crear}" class="btn btn-success">Nuevo Nacimiento</a>
         </div>
         
         <table class="table">
             <thead>
             <tr>
-                <th scope="col">ID</th>
                 <th scope="col">Hembra</th>
                 <th scope="col">Macho</th>
-                <th scope="col">Fecha Monta</th>
                 <th scope="col">Fecha Nacimiento</th>
                 <th scope="col">Gazapos Vivos</th>
                 <th scope="col">Gazapos Muertos</th>
@@ -39,17 +48,45 @@
             </thead>
             <tbody>
             <tr th:each="item : ${listaNacimientos}"> <!--Por cada item dentro de la lista nacimientos-->
-                <th th:text="${item.id}"></th>
-                <td th:text="${item.monta.hembra.nombre}"></td>
-                <td th:text="${item.monta.macho.nombre}"></td>
-                <td th:text="${item.monta.fecha_monta}"></td>
-                <td th:text="${item.fecha_nacimiento}"></td>
-                <td th:text="${item.gazapos_vivos}"></td>
-                <td th:text="${item.gazapos_muertos}"></td>
+
+                <td>
+                    <div>
+                        <span th:text="${item.macho.nombre}"></span>
+                    </div>
+                    <div>
+                        <a th:href="@{/img/conejos/{img}(img=${item.macho.nombreImagen})}" target="_blank">
+                            <img
+                            th:src="@{/img/conejos/{img}(img = ${item.macho.nombreImagen})}" 
+                            class="img-thumbnail"
+                            style="max-width: 100px; max-height: 100px; object-fit: cover;" 
+                            alt="Imagen del conejo macho">
+                        </a>
+                    </div>
+                </td>
+
+                <td>
+                    <div>
+                        <span th:text="${item.hembra.nombre}"></span>
+                    </div>
+                    <div>
+                        <a th:href="@{/img/conejos/{img}(img=${item.hembra.nombreImagen})}" target="_blank">
+                            <img
+                            th:src="@{/img/conejos/{img}(img = ${item.hembra.nombreImagen})}" 
+                            class="img-thumbnail"
+                            style="max-width: 100px; max-height: 100px; object-fit: cover;" 
+                            alt="Imagen del conejo hembra">
+                        </a>
+                    </div>
+                </td>
+
+                <td th:text="${item.fechaNacimiento}"></td>
+                <td th:text="${item.gazaposVivos}"></td>
+                <td th:text="${item.gazaposMuertos}"></td>
                 <td th:text="${item.nota}"></td>
                 <td>
-                <a th:href="@{/nacimientos/editar/{id}(id=${item.id})}" class="btn btn-info">Editar</a>
-                <a th:href="@{/nacimientos/eliminar/{id}(id=${item.id})}" class="btn btn-danger">Eliminar</a>
+                    <a th:href="@{/nacimientos/editar/{id}(id=${item.id})}" class="btn btn-info">Editar</a>
+                    <a th:href="@{/nacimientos/eliminar/{id}(id=${item.id})}" class="btn btn-danger" 
+                                onclick="return confirm('¿Seguro que deseas eliminar este nacimiento?')">Eliminar</a>
                 </td>
             </tr>
             </tbody>

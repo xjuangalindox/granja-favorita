@@ -1,5 +1,6 @@
 package com.example.demo.services;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +29,7 @@ public class NacimientoServiceImpl implements INacimientoService{
     @Override
     public List<NacimientoDTO> obtenerNacimientos() {
         List<NacimientoModel> entitiesList = (List<NacimientoModel>) nacimientoRepository.findAll();
+        entitiesList.sort(Comparator.comparing(item -> item.getFechaNacimiento()));
         
         // Conversion de List<NacimientoModel> a List<NacimientoDTO>
         List<NacimientoDTO> dtosList = entitiesList.stream()
@@ -93,6 +95,8 @@ public class NacimientoServiceImpl implements INacimientoService{
         return false;
     }
 
-
-    
+    @Override
+    public boolean existsById(Long id) {
+        return nacimientoRepository.existsById(id);
+    }   
 }
