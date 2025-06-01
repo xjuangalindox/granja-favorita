@@ -30,6 +30,16 @@ public class EjemplarServiceImpl implements IEjemplarService{
     private VentaRepository ventaRepository;
 
     @Override
+    public EjemplarDTO guardarEjemplar(EjemplarDTO ejemplarDTO) {
+        // Mapear de EjemplarDTO a EjemplarModel
+        EjemplarModel ejemplarModel = modelMapper.map(ejemplarDTO, EjemplarModel.class);
+        // Persistir EjemplarModel
+        EjemplarModel guardado = ejemplarRepository.save(ejemplarModel);
+        // Mapear y retornar
+        return modelMapper.map(guardado, EjemplarDTO.class);
+    }
+
+    @Override
     public boolean eliminarEjemplarPorId(Long id) {
         if(ejemplarRepository.existsById(id)){
             ejemplarRepository.deleteById(id);
@@ -47,7 +57,7 @@ public class EjemplarServiceImpl implements IEjemplarService{
         // Setear informacion de EjemplarDTO a EjemplarModel
         ejemplarModel.setNombreImagen(ejemplarDTO.getNombreImagen());
         ejemplarModel.setSexo(ejemplarDTO.getSexo());
-        ejemplarModel.setPrecio(ejemplarDTO.getPrecio());
+        //ejemplarModel.setPrecio(ejemplarDTO.getPrecio());
 
         // Asignar nuevo NacimientoModel a EjemplarModel
         NacimientoModel nacimientoModel = nacimientoRepository.findById(ejemplarDTO.getNacimiento().getId())
@@ -67,7 +77,7 @@ public class EjemplarServiceImpl implements IEjemplarService{
         EjemplarModel ejemplarModel = new EjemplarModel();
         ejemplarModel.setNombreImagen(ejemplarDTO.getNombreImagen());
         ejemplarModel.setSexo(ejemplarDTO.getSexo());
-        ejemplarModel.setPrecio(ejemplarDTO.getPrecio());
+        //ejemplarModel.setPrecio(ejemplarDTO.getPrecio());
 
         // Validar y asignar NacimientoModel a EjemplarModel
         NacimientoModel nacimientoModel = nacimientoRepository.findById(ejemplarDTO.getNacimiento().getId())
@@ -77,13 +87,12 @@ public class EjemplarServiceImpl implements IEjemplarService{
         // Validar y asignar VentaModel a EjemplarModel
         VentaModel ventaModel = ventaRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Venta no encontrada"));
-        ejemplarModel.setVenta(ventaModel);
+        //ejemplarModel.setVenta(ventaModel);
 
         // Persistir VentaModel
         EjemplarModel guardado = ejemplarRepository.save(ejemplarModel);
 
         // Mapear VentaModel a VentaDTO y retornar
         return modelMapper.map(guardado, EjemplarDTO.class);
-    }
-    
+    }    
 }

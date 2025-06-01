@@ -41,9 +41,10 @@ public class VentaModel {
     private String nota;
     private EstatusVenta estatus;   //PENDIENTE, APARTADO, ENTREGADO
 
+    /* 
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ArticuloVentaModel> articulos = new ArrayList<>();
 
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<EjemplarModel> ejemplares = new ArrayList<>();
+    private List<EjemplarModel> ejemplares = new ArrayList<>();*/
 }

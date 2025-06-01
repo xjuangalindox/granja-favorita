@@ -25,6 +25,42 @@ import jakarta.persistence.EntityNotFoundException;
 @Service
 public class VentaServiceImpl implements IVentaService {
 
+    @Override
+    public List<VentaDTO> obtenerVentas() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'obtenerVentas'");
+    }
+
+    @Override
+    public VentaDTO obtenerVentaPorId(Long id) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'obtenerVentaPorId'");
+    }
+
+    @Override
+    public VentaDTO guardarVenta(VentaDTO ventaDTO) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'guardarVenta'");
+    }
+
+    @Override
+    public VentaDTO actualizarDatosPrincipales(Long id, VentaDTO ventaDTO) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'actualizarDatosPrincipales'");
+    }
+
+    @Override
+    public VentaDTO editarVenta(Long id, VentaDTO ventaDTO) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'editarVenta'");
+    }
+
+    @Override
+    public boolean eliminarVenta(Long id) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'eliminarVenta'");
+    }
+/* 
     @Autowired
     private VentaRepository ventaRepository;
 
@@ -91,7 +127,7 @@ public class VentaServiceImpl implements IVentaService {
 
         // Asignar VentaModel a cada EjemplarModel
         for (EjemplarModel item : ventaModel.getEjemplares()) {
-            item.setVenta(ventaModel);
+            //item.setVenta(ventaModel);
         }
 
         // Persistir VentaModel
@@ -153,6 +189,6 @@ public class VentaServiceImpl implements IVentaService {
         // Eliminar la venta y todo lo asociado
         ventaRepository.deleteById(id);
         return true;
-    }
+    }*/
 
 }

@@ -36,7 +36,7 @@
         
         <table class="table">
             <thead>
-            <tr>
+            <tr class="text-center">
                 <th scope="col">Hembra</th>
                 <th scope="col">Macho</th>
                 <th scope="col">Fecha Nacimiento</th>
@@ -47,16 +47,16 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="item : ${listaNacimientos}"> <!--Por cada item dentro de la lista nacimientos-->
+            <tr class="text-center align-middle" th:each="item : ${listaNacimientos}"> <!--Por cada item dentro de la lista nacimientos-->
 
                 <td>
                     <div>
-                        <span th:text="${item.macho.nombre}"></span>
+                        <span th:text="${item.monta.macho.nombre}"></span>
                     </div>
                     <div>
-                        <a th:href="@{/img/conejos/{img}(img=${item.macho.nombreImagen})}" target="_blank">
+                        <a th:href="@{/img/conejos/{img}(img=${item.monta.macho.nombreImagen})}" target="_blank">
                             <img
-                            th:src="@{/img/conejos/{img}(img = ${item.macho.nombreImagen})}" 
+                            th:src="@{/img/conejos/{img}(img = ${item.monta.macho.nombreImagen})}" 
                             class="img-thumbnail"
                             style="max-width: 100px; max-height: 100px; object-fit: cover;" 
                             alt="Imagen del conejo macho">
@@ -66,12 +66,12 @@
 
                 <td>
                     <div>
-                        <span th:text="${item.hembra.nombre}"></span>
+                        <span th:text="${item.monta.hembra.nombre}"></span>
                     </div>
                     <div>
-                        <a th:href="@{/img/conejos/{img}(img=${item.hembra.nombreImagen})}" target="_blank">
+                        <a th:href="@{/img/conejos/{img}(img=${item.monta.hembra.nombreImagen})}" target="_blank">
                             <img
-                            th:src="@{/img/conejos/{img}(img = ${item.hembra.nombreImagen})}" 
+                            th:src="@{/img/conejos/{img}(img = ${item.monta.hembra.nombreImagen})}" 
                             class="img-thumbnail"
                             style="max-width: 100px; max-height: 100px; object-fit: cover;" 
                             alt="Imagen del conejo hembra">

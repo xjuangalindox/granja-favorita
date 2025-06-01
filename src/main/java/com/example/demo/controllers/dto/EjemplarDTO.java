@@ -2,6 +2,8 @@ package com.example.demo.controllers.dto;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,13 +14,12 @@ import lombok.NoArgsConstructor;
 public class EjemplarDTO {
     private Long id;
 
-    private String sexo;    //"Macho" o "Hembra"
-    private MultipartFile imagen; //Solo para recibir img del formulario
+    @JsonIgnore
+    private MultipartFile imagen;
+    
     private String nombreImagen;
-    private double precio;
+    private String sexo;
+    private boolean disponible;
 
     private NacimientoDTO nacimiento;
-
-    // ❌ Esto causaba recursividad
-    // private VentaDTO venta;
 }

@@ -1,6 +1,7 @@
 package com.example.demo.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.example.demo.controllers.dto.NacimientoDTO;
 
@@ -13,7 +14,7 @@ public interface INacimientoService {
     public NacimientoDTO obtenerNacimientoPorIdMonta(Long id);
 
     // Obtener monta por id
-    public NacimientoDTO obtenerNacimientoById(Long id);
+    public Optional<NacimientoDTO> obtenerNacimientoById(Long id);
 
     // Guardar monta
     public NacimientoDTO guardarNacimiento(NacimientoDTO nacimientoDTO);

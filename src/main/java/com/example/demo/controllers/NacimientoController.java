@@ -2,7 +2,7 @@ package com.example.demo.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,8 +13,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.example.demo.controllers.dto.MontaDTO;
+import com.example.demo.controllers.dto.EjemplarDTO;
 import com.example.demo.controllers.dto.NacimientoDTO;
+import com.example.demo.models.NacimientoModel;
 import com.example.demo.services.IMontaService;
 import com.example.demo.services.INacimientoService;
 
@@ -68,10 +69,22 @@ public class NacimientoController {
 	}
 
 	@PostMapping("/nacimientos/guardar")
-	public String postMethodName(@ModelAttribute("nacimientoDTO") NacimientoDTO nacimientoDTO) {
-		nacimientoService.guardarNacimiento(nacimientoDTO);
-		
-		return "redirect:/nacimientos";	// Redireccionar al endpoint: /nacimientos
+	public String guardarNacimiento(@ModelAttribute("nacimientoDTO") NacimientoDTO nacimientoDTO, Model model, RedirectAttributes redirectAttributes) {
+		try {
+			nacimientoService.guardarNacimiento(nacimientoDTO);
+			redirectAttributes.addFlashAttribute("ok", "Nacimiento registrado correctamente.");
+
+		} catch (Exception e) {
+			model.addAttribute("nacimientoDTO", nacimientoDTO);	// Enviar nacimientoDTO con informacion
+			model.addAttribute("titulo", "Registrar Nacimiento");	// Enviar titulo del formulario
+			model.addAttribute("accion", "/nacimientos/guardar");	// Enviar endpoint para guardar el nacimiento
+			model.addAttribute("listaMontas", montaService.obtenerMontas()); // Enviar lista de montas
+			
+			model.addAttribute("mensaje", "Ocurrió un error al guardar el nacimiento.");
+			return "nacimientos/formulario";
+		}
+
+		return "redirect:/nacimientos";
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,16 +92,22 @@ public class NacimientoController {
 
 	@GetMapping("/nacimientos/editar/{id}")
 	public String formularioEditar(@PathVariable("id") Long id, Model model) {
-		NacimientoDTO nacimientoDTO = nacimientoService.obtenerNacimientoById(id);	// Obtener plantilla con informacion de la BD
+		Optional<NacimientoDTO> nacimentoOpt = nacimientoService.obtenerNacimientoById(id);
+		NacimientoDTO nacimientoDTO = new NacimientoDTO();
+		if(nacimentoOpt.isPresent()){
+			nacimientoDTO = nacimentoOpt.get();
+		}
+
 		model.addAttribute("nacimientoDTO", nacimientoDTO);	// Enviar plantilla con informacion
 		model.addAttribute("titulo", "Editar Nacimiento");	// Enviar titulo del formulario
 		model.addAttribute("accion", "/nacimientos/editar/"+id);	// Enviar enpoint para editar el nacimiento
+		model.addAttribute("listaMontas", montaService.obtenerMontas()); // Enviar lista de montas
 
 		return "nacimientos/formulario";	// Retornar al formulatio html
 	}
 	
 	@PostMapping("/nacimientos/editar/{id}")
-	public String postMethodName(@PathVariable("id") Long id, @ModelAttribute("nacimientoDTO") NacimientoDTO nacimientoDTO) {
+	public String editarNacimiento(@PathVariable("id") Long id, @ModelAttribute("nacimientoDTO") NacimientoDTO nacimientoDTO) {
 		nacimientoService.editarNacimiento(id, nacimientoDTO);	// Enviar informacion al servicio para editar		
 
 		return "redirect:/nacimientos";	// Redireccionar al endpoint: /nacimientos
@@ -99,21 +118,13 @@ public class NacimientoController {
 	
 	@GetMapping("/nacimientos/eliminar/{id}")
 	public String eliminarNacimiento(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
-		if(nacimientoService.existsById(id)){
-
-			try {
-				nacimientoService.eliminarNacimientoById(id);
-				// Eliminar cada img de cada ejemplar del nacimiento
-				redirectAttributes.addFlashAttribute("ok", "Nacimiento eliminado correctamente.");
-
-			} catch (Exception e) {
-				redirectAttributes.addFlashAttribute("error", "Ocurrió un error al eliminar el nacimiento.");
-			}
-
-		}else{
-			redirectAttributes.addFlashAttribute("error", "El nacimiento con ID "+id+" no fue encontrado.");
+		try {
+			nacimientoService.eliminarNacimientoById(id);
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("error", "Ocurrió un error al eliminar el nacimiento.");
 		}
 
+		redirectAttributes.addFlashAttribute("ok", "Nacimiento eliminado correctamente.");
 		return "redirect:/nacimientos";
 	}
 	

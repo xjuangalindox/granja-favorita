@@ -1,9 +1,11 @@
 package com.example.demo.models;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -23,14 +25,12 @@ public class EjemplarModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String sexo;    //"Macho" o "Hembra"
+    @Column(name = "nombre_imagen")
     private String nombreImagen;
-    private double precio;
+    private String sexo;
+    private boolean disponible;
 
     @ManyToOne
+    @JoinColumn(name = "nacimiento_id", nullable = false)
     private NacimientoModel nacimiento;
-
-    // No almacena ningun valor, obligatorio para la relacion
-    @ManyToOne
-    private VentaModel venta;
 }

@@ -1,6 +1,7 @@
 package com.example.demo.controllers.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -35,7 +36,10 @@ public class NacimientoDTO {
 	@Size(min = 0, max = 50)
 	private String nota;
 	
-	// Relacion con MontaDTO
+	// RELACIONES
 	@Valid
 	private MontaDTO monta;
+
+	@Valid
+	private List<EjemplarDTO> ejemplares;
 }

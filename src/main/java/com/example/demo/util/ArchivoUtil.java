@@ -8,6 +8,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class ArchivoUtil {
     
+	// Obtener nombre base de imagen
+	public static String obtenerNombreBaseImagen(MultipartFile imagen){
+		return FilenameUtils.getBaseName(imagen.getOriginalFilename());
+	}
+
     // Obtener extension de imagen
 	public static String obtenerExtensionImagen(MultipartFile imagen){
 		return FilenameUtils.getExtension(imagen.getOriginalFilename());

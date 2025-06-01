@@ -3,7 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Estilos Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <!-- Iconos Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <!-- CSS -->
+    <link rel="stylesheet" th:href="@{/styles.css}">
+    <!-- jQuery y Select2 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <title>Formulario</title>
 </head>
 <body>
@@ -11,78 +21,131 @@
     <div class="container mt-4">
         <div class="card shadow-lg border-0 rounded-4">
             <div class="card-body p-4">
-                <h3 class="card-title text-center mb-4">Registrar Nacimiento</h3>
+
+                <!-- Titulo -->
+                <h3 class="card-title text-center mb-4" th:text="${titulo}">Titulo</h3>
     
-                <form th:action="@{${accion}}" th:object="${nacimientoDTO}" method="post">
+                <!-- Mensaje Danger -->
+                <div th:if="${mensaje}" class="alert alert-danger text-center" role="alert">
+                    <span th:text="${mensaje}"></span>
+                </div>
+                
+                <form th:action="@{${accion}}" th:object="${nacimientoDTO}" method="post" enctype="multipart/form-data">
                     <div class="row">
                         <!-- Columna izquierda: Info de la Monta -->
                         <div class="col-md-6 border-end pe-4">
-                            <h5 class="text-secondary mb-3 text-center">📝 Detalles de la Monta</h5>
+                            <h5 class="text-secondary mb-3 text-center">📝 Información</h5>
+
+                            <!-- Selector con lista de conejos hembras -->
+                            <div class="mb-3">
+                                <label for="monta" class="form-label">Montas Disponibles</label>
+                                <select id="monta" class="form-select" th:field="*{monta.id}" required>
+                                    <option value="">Selecciona una monta</option>
+                                    <option th:each="monta : ${listaMontas}"
+                                            th:value="${monta.id}"
+                                            th:data-img-macho="@{/img/conejos/{img}(img=${monta.macho.nombreImagen})}"
+                                            th:data-img-hembra="@{/img/conejos/{img}(img=${monta.hembra.nombreImagen})}"
+                                            th:text="${monta.macho.nombre +' + '+monta.hembra.nombre}"
+                                            th:data-fecha="${#temporals.format(monta.fechaMonta, 'dd/MMMM/yyyy')}">
+                                    </option>
+                                </select>
+                            </div>
 
                             <div class="mb-3">
-                                <label class="form-label fw-bold">ID Monta</label>
-                                <input type="number" class="form-control" th:field="*{monta.id}" th:value="*{monta.id}" readonly>
+                                <label for="fechaNacimiento" class="form-label fw-bold">Fecha Nacimiento</label>
+                                <input id="fechaNacimiento" class="form-control" type="date" th:field="*{fechaNacimiento}" required>
+                            </div>
+    
+                            <div class="mb-3">
+                                <label for="gazaposVivos" class="form-label fw-bold">Gazapos Vivos</label>
+                                <input id="gazaposVivos" class="form-control" type="number" th:field="*{gazaposVivos}">
+                            </div>
+    
+                            <div class="mb-3">
+                                <label for="gazaposMuertos" class="form-label fw-bold">Gazapos Muertos</label>
+                                <input id="gazaposMuertos" class="form-control" type="number" th:field="*{gazaposMuertos}">
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Fecha Monta</label>
-                                <input type="date" class="form-control" th:value="*{monta.fecha_monta}" readonly>
+                                <label for="nota" class="form-label">Nota</label>
+                                <textArea id="nota" class="form-control" th:field="*{nota}" rows="3" maxlength="500"></textArea>
                             </div>
-    
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Cantidad Montas</label>
-                                <input type="number" class="form-control" th:value="*{monta.cantidad_montas}" readonly>
+
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg rounded-3 shadow">Guardar Nacimiento</button>
                             </div>
-    
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Nota</label>
-                                <input type="text" class="form-control" th:value="*{monta.nota}" readonly>
-                            </div>
-    
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Hembra</label>
-                                <input type="text" class="form-control" th:value="*{monta.hembra.nombre}" readonly>
-                            </div>
-    
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Macho</label>
-                                <input type="text" class="form-control" th:value="*{monta.macho.nombre}" readonly>
-                            </div>
+
                         </div>
     
                         <!-- Columna derecha: Formulario Nacimiento -->
                         <div class="col-md-6 ps-4">
-                            <h5 class="text-secondary mb-3 text-center">🐇 Información del Nacimiento</h5>
+                            <h5 class="text-secondary mb-3 text-center">🐇 Ejemplares</h5>
     
+                            <!--EJEMPLARES INFORMACION-->
+                            <h5>Nacimientos Disponibles</h5>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Imagen</th>
+                                        <th scope="col">Sexo</th>
+                                        <th scope="col">Disponible</th>
+                                        <th style="width: 50px;"></th> <!--Boton Eliminar-->
+                                    </tr>
+                                </thead>
+                                <tbody id="ejemplaresContainer">
+                                    <!-- Filas dinámicas aqui -->
+                                </tbody>
+                            </table>
+
+                            <!--Boton Agregar Ejemplar-->
                             <div class="mb-3">
-                                <label for="fecha_nacimiento" class="form-label fw-bold">Fecha Nacimiento</label>
-                                <input type="date" th:field="*{fecha_nacimiento}" class="form-control" id="fecha_nacimiento" required>
+                                <button type="button" class="btn btn-success" onclick="agregarEjemplar()">Agregar ejemplar</button>
                             </div>
     
-                            <div class="mb-3">
-                                <label for="gazapos_vivos" class="form-label fw-bold">Gazapos Vivos</label>
-                                <input type="number" th:field="*{gazapos_vivos}" class="form-control" id="gazapos_vivos" required>
-                            </div>
-    
-                            <div class="mb-3">
-                                <label for="gazapos_muertos" class="form-label fw-bold">Gazapos Muertos</label>
-                                <input type="number" th:field="*{gazapos_muertos}" class="form-control" id="gazapos_muertos" required>
-                            </div>
-    
-                            <div class="mb-3">
-                                <label for="nota" class="form-label fw-bold">Nota</label>
-                                <input type="text" th:field="*{nota}" class="form-control" id="nota">
-                            </div>
-    
-                            <div class="d-grid mt-4">
-                                <button type="submit" class="btn btn-primary btn-lg rounded-3 shadow">Guardar Nacimiento</button>
-                            </div>
+
                         </div>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+
+    <script>
+    $(document).ready(function() {
+        // Aplica Select2 a ambos selects
+        $('#monta').select2({
+        templateResult: formatOption,
+        templateSelection: formatOption,
+        minimumResultsForSearch: -1 // Oculta el buscador si no quieres filtro
+        });
+
+        function formatOption(state) {
+        if (!state.id) return state.text;
+
+        const imgMacho = $(state.element).data('img-macho')
+        const imgHembra = $(state.element).data('img-hembra');
+        const fechaMonta = $(state.element).data('fecha');
+        const name = state.text;
+
+        return $(`
+            <div class="option-wrapper">
+                <img src="${imgMacho}" class="img-select" title="Macho" />
+                <img src="${imgHembra}" class="img-select" title="Hembra" />
+                <span>&nbsp;&nbsp;${name}</span>
+                <span>&nbsp;&nbsp;(${fechaMonta})</span>
+            </div>
+        `);
+        }
+    });
+    </script>
+
+    <!-- primero definimos la variable con los datos -->
+    <script th:inline="javascript">
+        let ejemplares = /*[[${nacimientoDTO.ejemplares}]]*/ [];
+    </script>
+
+    <!-- luego cargamos el archivo que la usa -->
+    <script th:src="@{/js/nacimiento-formulario.js}"></script>
 
 </body>
 </html>
