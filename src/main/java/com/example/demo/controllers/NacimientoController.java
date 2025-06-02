@@ -91,19 +91,31 @@ public class NacimientoController {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	@GetMapping("/nacimientos/editar/{id}")
-	public String formularioEditar(@PathVariable("id") Long id, Model model) {
-		Optional<NacimientoDTO> nacimentoOpt = nacimientoService.obtenerNacimientoById(id);
-		NacimientoDTO nacimientoDTO = new NacimientoDTO();
-		if(nacimentoOpt.isPresent()){
-			nacimientoDTO = nacimentoOpt.get();
+	public String formularioEditar(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
+		Optional<NacimientoDTO> nacimientoOpt = nacimientoService.obtenerNacimientoById(id);
+		
+		if(nacimientoOpt.isEmpty()){
+			redirectAttributes.addFlashAttribute("error", "El nacimiento con ID " + id + " no fue encontrado.");
+			return "redirect:/nacimientos";	
 		}
+		
+		System.out.println("\n\n");
+		System.out.println("OPTIONAL");
+		System.out.println(nacimientoOpt.get());
+		System.out.println("\n\n");
 
-		model.addAttribute("nacimientoDTO", nacimientoDTO);	// Enviar plantilla con informacion
-		model.addAttribute("titulo", "Editar Nacimiento");	// Enviar titulo del formulario
-		model.addAttribute("accion", "/nacimientos/editar/"+id);	// Enviar enpoint para editar el nacimiento
-		model.addAttribute("listaMontas", montaService.obtenerMontas()); // Enviar lista de montas
+		NacimientoDTO nacimientoDTO = nacimientoOpt.get();
 
-		return "nacimientos/formulario";	// Retornar al formulatio html
+		System.out.println("\n\n");
+		System.out.println("DTO");
+		System.out.println(nacimientoDTO);
+		System.out.println("\n\n");
+
+		model.addAttribute("nacimientoDTO", nacimientoDTO);
+		model.addAttribute("titulo", "Editar Nacimiento");
+		model.addAttribute("accion", "/nacimientos/editar/"+id);
+		model.addAttribute("listaMontas", montaService.obtenerMontas());
+		return "nacimientos/formulario";
 	}
 	
 	@PostMapping("/nacimientos/editar/{id}")

@@ -4,6 +4,7 @@
 
 window.addEventListener('DOMContentLoaded', () => {    
     if(ejemplares.length > 0){
+        console.log(ejemplares.length);
         ejemplares.forEach(eje => agregarEjemplarExistente(eje));
     }
 });
@@ -40,7 +41,7 @@ function agregarEjemplar() {
             </select>
         </td>
         <td>
-            <input class="form-check-input" type="checkbox" name="ejemplares[${contador}].disponible" checked readonly required>
+            <input class="form-check-input" type="checkbox" name="ejemplares[${contador}].disponible" checked required>
         </td>
 
         <td>
@@ -85,7 +86,7 @@ function agregarEjemplarExistente(eje) {
             </select>
         </td>
         <td>
-            <input class="form-check-input" type="checkbox" name="ejemplares[${contador}].disponible" readonly required>
+            <input class="form-check-input" type="checkbox" name="ejemplares[${contador}].disponible" required>
         </td>
 
         <td>
@@ -96,7 +97,7 @@ function agregarEjemplarExistente(eje) {
     `;
     
     tbody.appendChild(row);
-    contEjemplar++;
+    contador++;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -138,14 +139,14 @@ function eliminarEjemplar(boton) {
     }
 
     row.remove();
-    actualizarTotalVenta()
+    //actualizarTotalVenta()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //AGREGAR LOS IDs ELIMINADOS COMO INPUTS OCULTOS
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-document.getElementById("formVenta").addEventListener("submit", function () {
+document.getElementById("formNacimiento").addEventListener("submit", function () {
     ejemplaresEliminados.forEach(id => {
         const input = document.createElement("input");
         input.type = "hidden";

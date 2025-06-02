@@ -6,7 +6,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,12 +16,14 @@ import lombok.NoArgsConstructor;
 public class EjemplarDTO {
     private Long id;
 
-    @JsonIgnore
+    //@JsonIgnore
     private MultipartFile imagen;
     
     private String nombreImagen;
     private String sexo;
     private boolean disponible;
 
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private NacimientoDTO nacimiento;
 }

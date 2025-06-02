@@ -30,7 +30,7 @@
                     <span th:text="${mensaje}"></span>
                 </div>
                 
-                <form th:action="@{${accion}}" th:object="${nacimientoDTO}" method="post" enctype="multipart/form-data">
+                <form id="formNacimiento" th:action="@{${accion}}" th:object="${nacimientoDTO}" method="post" enctype="multipart/form-data">
                     <div class="row">
                         <!-- Columna izquierda: Info de la Monta -->
                         <div class="col-md-6 border-end pe-4">

@@ -48,5 +48,4 @@ public class NacimientoModel {
 
 	@OneToMany(mappedBy = "nacimiento", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<EjemplarModel> ejemplares;
-	
 }

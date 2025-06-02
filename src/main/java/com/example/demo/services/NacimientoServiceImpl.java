@@ -3,7 +3,6 @@ package com.example.demo.services;
 import java.lang.foreign.Linker.Option;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -11,9 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.FilenameUtils;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.internal.bytebuddy.implementation.bytecode.Throw;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -80,7 +77,6 @@ public class NacimientoServiceImpl implements INacimientoService{
 
     @Override
     public NacimientoDTO guardarNacimiento(NacimientoDTO nacimientoDTO) {
-
         // Buscar MontaModel del NacimientoModel
         MontaModel montaModel = montaRepository.findById(nacimientoDTO.getMonta().getId())
             .orElseThrow(() -> new RuntimeException("Monta no encontrada"));
@@ -114,11 +110,6 @@ public class NacimientoServiceImpl implements INacimientoService{
                     if(item.getImagen() != null && !item.getImagen().isEmpty()){
                         nombreImagen = guardarImagenEnDisco(nombreBase, item.getImagen());
                     }
-
-                System.out.println("\n\n\n");
-                System.out.println("SERVICE");
-                System.out.println("NOMBRE IMAGEN: "+nombreImagen);
-                System.out.println("\n\n\n");
 
                     // Mapear y persitir EjemplarModel
                     EjemplarModel ejemplarModel = new EjemplarModel();
@@ -158,7 +149,7 @@ public class NacimientoServiceImpl implements INacimientoService{
 
         int contador = 1;
         while (Files.exists(ruta)) {
-            nombreImagen = nombreBase + "(" + contador + ")" + extension;
+            nombreImagen = ArchivoUtil.crearNombreImagen(nombreBase + "(" + contador + ")", extension);
             ruta = ArchivoUtil.crearRuta(RUTA_EJEMPLARES, nombreImagen);
             contador++;
         }
