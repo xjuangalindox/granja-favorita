@@ -1,6 +1,5 @@
 package com.example.demo.services;
 
-import java.lang.foreign.Linker.Option;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -133,12 +132,21 @@ public class NacimientoServiceImpl implements INacimientoService{
         return modelMapper.map(nacimientoModel, NacimientoDTO.class);
     }
 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     private List<EjemplarDTO> filtrarEjemplaresNuevos(List<EjemplarDTO> ejemplares) {
         return ejemplares.stream()
             .filter(item -> 
-                (item.getImagen() != null && !item.getImagen().isEmpty()) &&
-                item.getSexo() != null &&
-                item.isDisponible())
+                item.getId() == null &&
+                (item.getImagen() != null && !item.getImagen().isEmpty()))
+            .collect(Collectors.toList());
+    }
+
+    private List<EjemplarDTO> filtrarEjemplaresExistentes(List<EjemplarDTO> ejemplares) {
+        return ejemplares.stream()
+            .filter(item -> 
+                item.getId() != null)
             .collect(Collectors.toList());
     }
 
@@ -163,17 +171,115 @@ public class NacimientoServiceImpl implements INacimientoService{
         return nombreImagen;
     }
 
-    @Override
-    public NacimientoDTO editarNacimiento(Long id, NacimientoDTO nacimientoDTO) {
-        nacimientoDTO.setId(id);
-        // Conversion de NacimientoDTO a NacimientoModel
-        NacimientoModel nacimientoModel = modelMapper.map(nacimientoDTO, NacimientoModel.class);
-        // Guardar
-        NacimientoModel nacimientoModelEditado  = nacimientoRepository.save(nacimientoModel);
-        // Conversion de NacimientoModel a NacimientoDTO
-        NacimientoDTO nacimientoDTOEditado = modelMapper.map(nacimientoModelEditado, NacimientoDTO.class);
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        return nacimientoDTOEditado;
+    @Override
+    public NacimientoDTO editarNacimiento(Long id, NacimientoDTO nacimientoDTO, List<Long> ejemplaresEliminados) {
+        // 1. Eliminar ejemplares eliminados en el formulario
+        if(ejemplaresEliminados != null && !ejemplaresEliminados.isEmpty()){
+
+            ejemplaresEliminados.forEach(item -> {
+                Optional<EjemplarModel> ejemplarOpt = ejemplarRepository.findById(item);
+                if(ejemplarOpt.isPresent()){
+                    EjemplarModel ejemplarModel = ejemplarOpt.get();
+                    Path ruta = ArchivoUtil.crearRuta(RUTA_EJEMPLARES, ejemplarModel.getNombreImagen());
+
+                    try {
+                        // Desvincular ejemplar de nacimiento y eliminar
+                        ejemplarModel.setNacimiento(null);
+                        ejemplarModel = ejemplarRepository.save(ejemplarModel);
+                        ejemplarRepository.deleteById(ejemplarModel.getId());
+                        // Eliminar imagen en disco del ejemplar
+                        Files.deleteIfExists(ruta);
+
+                    } catch (Exception e) {
+                        throw new RuntimeException("Ocurrió un error al eliminar el ejemplar");
+                    }
+                }
+            });
+        }
+
+        // 2. Settear informacion y actualizar el nacimiento
+        NacimientoModel nacimientoModel = nacimientoRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Nacimiento no encontrado"));
+
+        MontaModel montaModel = montaRepository.findById(nacimientoDTO.getMonta().getId())
+            .orElseThrow(() -> new RuntimeException("Monta no encontrada"));
+
+        nacimientoModel.setFechaNacimiento(nacimientoDTO.getFechaNacimiento());
+        nacimientoModel.setGazaposVivos(nacimientoDTO.getGazaposVivos());
+        nacimientoModel.setGazaposMuertos(nacimientoDTO.getGazaposMuertos());
+        nacimientoModel.setNota(nacimientoDTO.getNota());
+        nacimientoModel.setMonta(montaModel);
+
+        nacimientoModel = nacimientoRepository.save(nacimientoModel);
+
+        // 3. ¿El nacimiento tiene ejemplares?
+        if(nacimientoDTO.getEjemplares() != null && !nacimientoDTO.getEjemplares().isEmpty()){
+            // Filtrar ejemplares validos (nuevos y modificados)    
+            List<EjemplarDTO> ejemplaresNuevos = filtrarEjemplaresNuevos(nacimientoDTO.getEjemplares());
+            List<EjemplarDTO> ejemplaresExistentes = filtrarEjemplaresExistentes(nacimientoDTO.getEjemplares());
+            
+            // Nombre base para imagenes
+            String nombreConejo = montaModel.getMacho().getNombre();
+            String nombreConeja = montaModel.getHembra().getNombre();
+            LocalDate fechaNacimiento = nacimientoModel.getFechaNacimiento();
+            String nombreBase = nombreConejo +"_"+ nombreConeja +"_"+ fechaNacimiento;
+
+            // 4. Persistir ejemplares nuevos y agregarlos a la lista
+            if(ejemplaresNuevos != null && !ejemplaresNuevos.isEmpty()){
+                for(EjemplarDTO item : ejemplaresNuevos){
+                    String nombreImagen = null;
+                    if(item.getImagen() != null && !item.getImagen().isEmpty()){
+                        nombreImagen = guardarImagenEnDisco(nombreBase, item.getImagen());
+                    }
+
+                    EjemplarModel ejemplarModel = new EjemplarModel();
+                    ejemplarModel.setNombreImagen(nombreImagen);
+                    ejemplarModel.setSexo(item.getSexo());
+                    ejemplarModel.setDisponible(item.isDisponible());
+                    ejemplarModel.setNacimiento(nacimientoModel);
+
+                    ejemplarRepository.save(ejemplarModel);
+                }
+            }
+
+            // 5. Persistir ejemplares existentes y agregarlos a la lista
+            if(ejemplaresExistentes != null && !ejemplaresExistentes.isEmpty()){
+                for(EjemplarDTO item : ejemplaresExistentes){
+
+                    EjemplarModel ejemplarModel = ejemplarRepository.findById(item.getId())
+                        .orElseThrow(() -> new RuntimeException("Ejemplar no encontrado"));
+
+                    Path ruta = null;
+                    String nombreImagen = null;
+                    if(item.getImagen() != null && !item.getImagen().isEmpty()){
+                        ruta = ArchivoUtil.crearRuta(RUTA_EJEMPLARES, item.getNombreImagen());
+                        
+                        try {
+                            Files.deleteIfExists(ruta);
+                            nombreImagen = guardarImagenEnDisco(nombreBase, item.getImagen());
+
+                        } catch (Exception e) {
+                            throw new RuntimeException("Error al modificar el ejemplar");
+                        }
+                    }
+
+                    if(nombreImagen != null){
+                        ejemplarModel.setNombreImagen(nombreImagen);
+                    }
+                    ejemplarModel.setSexo(item.getSexo());
+                    ejemplarModel.setDisponible(item.isDisponible());
+                    ejemplarModel.setNacimiento(nacimientoModel);
+
+                    ejemplarRepository.save(ejemplarModel);
+                }
+            }
+        }
+
+        // 6. Mapear y retornar
+        return modelMapper.map(nacimientoModel, NacimientoDTO.class);
     }
 
     @Override

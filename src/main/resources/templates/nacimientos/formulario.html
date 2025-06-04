@@ -58,12 +58,12 @@
     
                             <div class="mb-3">
                                 <label for="gazaposVivos" class="form-label fw-bold">Gazapos Vivos</label>
-                                <input id="gazaposVivos" class="form-control" type="number" th:field="*{gazaposVivos}">
+                                <input id="gazaposVivos" class="form-control" type="number" th:field="*{gazaposVivos}" min="0" max="15">
                             </div>
     
                             <div class="mb-3">
                                 <label for="gazaposMuertos" class="form-label fw-bold">Gazapos Muertos</label>
-                                <input id="gazaposMuertos" class="form-control" type="number" th:field="*{gazaposMuertos}">
+                                <input id="gazaposMuertos" class="form-control" type="number" th:field="*{gazaposMuertos}" min="0" max="15">
                             </div>
 
                             <div class="mb-3">

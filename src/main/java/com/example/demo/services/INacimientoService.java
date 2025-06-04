@@ -20,8 +20,8 @@ public interface INacimientoService {
     public NacimientoDTO guardarNacimiento(NacimientoDTO nacimientoDTO);
 
     // Editar monta
-    public NacimientoDTO editarNacimiento(Long id, NacimientoDTO nacimientoDTO);
-
+    public NacimientoDTO editarNacimiento(Long id, NacimientoDTO nacimientoDTO, List<Long> ejemplaresEliminados);
+    
     // Eliminar monta por id
     public boolean eliminarNacimientoById(Long id);
 

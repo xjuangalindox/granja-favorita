@@ -1,5 +1,7 @@
 package com.example.demo.services;
 
+import java.util.Optional;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -94,5 +96,11 @@ public class EjemplarServiceImpl implements IEjemplarService{
 
         // Mapear VentaModel a VentaDTO y retornar
         return modelMapper.map(guardado, EjemplarDTO.class);
+    }
+
+    @Override
+    public Optional<EjemplarDTO> obtenerEjemplarPorId(Long id) {
+        return ejemplarRepository.findById(id)
+            .map(model -> modelMapper.map(model, EjemplarDTO.class));
     }    
 }

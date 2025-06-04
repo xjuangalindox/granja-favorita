@@ -11,11 +11,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.example.demo.controllers.dto.EjemplarDTO;
 import com.example.demo.controllers.dto.NacimientoDTO;
-import com.example.demo.models.NacimientoModel;
 import com.example.demo.services.IMontaService;
 import com.example.demo.services.INacimientoService;
 
@@ -98,20 +97,8 @@ public class NacimientoController {
 			redirectAttributes.addFlashAttribute("error", "El nacimiento con ID " + id + " no fue encontrado.");
 			return "redirect:/nacimientos";	
 		}
-		
-		System.out.println("\n\n");
-		System.out.println("OPTIONAL");
-		System.out.println(nacimientoOpt.get());
-		System.out.println("\n\n");
 
-		NacimientoDTO nacimientoDTO = nacimientoOpt.get();
-
-		System.out.println("\n\n");
-		System.out.println("DTO");
-		System.out.println(nacimientoDTO);
-		System.out.println("\n\n");
-
-		model.addAttribute("nacimientoDTO", nacimientoDTO);
+		model.addAttribute("nacimientoDTO", nacimientoOpt.get());
 		model.addAttribute("titulo", "Editar Nacimiento");
 		model.addAttribute("accion", "/nacimientos/editar/"+id);
 		model.addAttribute("listaMontas", montaService.obtenerMontas());
@@ -119,8 +106,23 @@ public class NacimientoController {
 	}
 	
 	@PostMapping("/nacimientos/editar/{id}")
-	public String editarNacimiento(@PathVariable("id") Long id, @ModelAttribute("nacimientoDTO") NacimientoDTO nacimientoDTO) {
-		nacimientoService.editarNacimiento(id, nacimientoDTO);	// Enviar informacion al servicio para editar		
+	public String editarNacimiento(@PathVariable("id") Long id, @ModelAttribute("nacimientoDTO") NacimientoDTO nacimientoDTO,
+		@RequestParam(name = "ejemplaresEliminados", required = false) List<Long> ejemplaresEliminados,
+		Model model, RedirectAttributes redirectAttributes) {
+		
+		try {
+			nacimientoService.editarNacimiento(id, nacimientoDTO, ejemplaresEliminados);
+			redirectAttributes.addFlashAttribute("ok", "Nacimiento modificado correctamente.");
+
+		} catch (Exception e) {
+			model.addAttribute("nacimientoDTO", nacimientoDTO);
+			model.addAttribute("titulo", "Editar Nacimiento");
+			model.addAttribute("accion", "/nacimientos/editar/"+id);
+			model.addAttribute("listaMontas", montaService.obtenerMontas());
+
+			model.addAttribute("mensaje", "Ocurrio un error al modificar el nacimiento.");
+			return "nacimientos/formulario";
+		}
 
 		return "redirect:/nacimientos";	// Redireccionar al endpoint: /nacimientos
 	}

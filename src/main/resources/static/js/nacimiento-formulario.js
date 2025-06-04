@@ -4,7 +4,7 @@
 
 window.addEventListener('DOMContentLoaded', () => {    
     if(ejemplares.length > 0){
-        console.log(ejemplares.length);
+        console.log("Ejemplares existentes: " + ejemplares.length);
         ejemplares.forEach(eje => agregarEjemplarExistente(eje));
     }
 });
@@ -41,7 +41,7 @@ function agregarEjemplar() {
             </select>
         </td>
         <td>
-            <input class="form-check-input" type="checkbox" name="ejemplares[${contador}].disponible" checked required>
+            <input class="form-check-input" type="checkbox" name="ejemplares[${contador}].disponible" checked>
         </td>
 
         <td>
@@ -86,7 +86,7 @@ function agregarEjemplarExistente(eje) {
             </select>
         </td>
         <td>
-            <input class="form-check-input" type="checkbox" name="ejemplares[${contador}].disponible" required>
+            <input class="form-check-input" type="checkbox" name="ejemplares[${contador}].disponible" ${eje.disponible ? 'checked' : ''}>
         </td>
 
         <td>

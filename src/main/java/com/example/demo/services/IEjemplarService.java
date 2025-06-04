@@ -1,8 +1,12 @@
 package com.example.demo.services;
 
+import java.util.Optional;
+
 import com.example.demo.controllers.dto.EjemplarDTO;
 
 public interface IEjemplarService {
+
+    public Optional<EjemplarDTO> obtenerEjemplarPorId(Long id);
 
     public EjemplarDTO guardarEjemplar(EjemplarDTO ejemplarDTO);
 

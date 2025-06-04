@@ -16,13 +16,14 @@ import lombok.ToString;
 public class EjemplarDTO {
     private Long id;
 
-    //@JsonIgnore
+    @JsonIgnore
     private MultipartFile imagen;
     
     private String nombreImagen;
     private String sexo;
     private boolean disponible;
 
+    @JsonIgnore
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private NacimientoDTO nacimiento;
