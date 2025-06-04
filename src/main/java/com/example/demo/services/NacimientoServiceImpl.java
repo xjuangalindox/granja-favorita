@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.controllers.dto.EjemplarDTO;
+import com.example.demo.controllers.dto.MontaDTO;
 import com.example.demo.controllers.dto.NacimientoDTO;
 import com.example.demo.models.EjemplarModel;
 import com.example.demo.models.MontaModel;
@@ -313,5 +314,14 @@ public class NacimientoServiceImpl implements INacimientoService{
     @Override
     public boolean existsById(Long id) {
         return nacimientoRepository.existsById(id);
-    }   
+    }
+
+    @Override
+    public Optional<NacimientoDTO> findByMonta(MontaDTO montaDTO) {
+        MontaModel montaModel = modelMapper.map(montaDTO, MontaModel.class);
+
+        return nacimientoRepository.findByMonta(montaModel)
+            .map(model -> modelMapper.map(model, NacimientoDTO.class));
+    }
+
 }

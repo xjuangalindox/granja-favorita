@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,7 +15,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.demo.controllers.dto.MontaDTO;
 import com.example.demo.controllers.dto.NacimientoDTO;
+import com.example.demo.models.MontaModel;
+import com.example.demo.models.NacimientoModel;
+import com.example.demo.repositories.MontaRepository;
+import com.example.demo.repositories.NacimientoRepository;
 import com.example.demo.services.IMontaService;
 import com.example.demo.services.INacimientoService;
 
@@ -41,25 +47,51 @@ public class NacimientoController {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	@GetMapping("/nacimientos/por-monta/{idMonta}")
-	public String obtenerNacimientoPorMonta(Model model, @PathVariable("idMonta") Long idMonta) {
-		NacimientoDTO nacimientoDTO = nacimientoService.obtenerNacimientoPorIdMonta(idMonta);
-		List<NacimientoDTO> listaNacimientos = new ArrayList<>();
+	@GetMapping("/nacimientos/editar/por-monta/{idMonta}")
+	public String obtenerNacimientoPorMonta(@PathVariable("idMonta") Long idMonta, Model model, RedirectAttributes redirectAttributes) {
 		
-		if(nacimientoDTO != null){
-			listaNacimientos.add(nacimientoDTO);
+		Optional<MontaDTO> montaOpt = montaService.obtenerMontaById(idMonta);
+		if(montaOpt.isEmpty()){
+			redirectAttributes.addFlashAttribute("error", "La monta con ID " + idMonta + " no fue encontrada.");
+			return "redirect:/montas";	
 		}
-		model.addAttribute("listaNacimientos", listaNacimientos);
 
-		return "nacimientos/lista";	// Retornar al html
+		MontaDTO montaDTO = montaOpt.get();
+		Optional<NacimientoDTO> nacimientoOpt = nacimientoService.findByMonta(montaDTO);
+
+		if(nacimientoOpt.isEmpty()){
+			redirectAttributes.addFlashAttribute("error", "La monta con ID "+ idMonta+" no pertenece a ningún nacimiento.");
+			return "redirect:/montas";	
+		}
+
+		NacimientoDTO nacimientoDTO = nacimientoOpt.get();
+
+		model.addAttribute("nacimientoDTO", nacimientoDTO);
+		model.addAttribute("titulo", "Editar Nacimiento");
+		model.addAttribute("accion", "/nacimientos/editar/"+nacimientoDTO.getId());
+		model.addAttribute("listaMontas", montaService.obtenerMontas());
+		return "nacimientos/formulario";
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	@GetMapping("/nacimientos/crear")
-	public String formularioCrear(Model model) {
-		model.addAttribute("nacimientoDTO", new NacimientoDTO());	// Enviar nacimientoDTO
+	public String formularioCrear(Model model, RedirectAttributes redirectAttributes,
+		@RequestParam(name = "idMonta", required = false) Long idMonta) {
+
+		NacimientoDTO nacimientoDTO = new NacimientoDTO();
+		
+		if(idMonta != null){
+			Optional<MontaDTO> montaOpt = montaService.obtenerMontaById(idMonta);
+			if(montaOpt.isEmpty()){
+				redirectAttributes.addFlashAttribute("error", "La monta con ID "+idMonta+" no fue encontrada.");
+				return "redirect:/montas";
+			}
+			nacimientoDTO.setMonta(montaOpt.get());
+		}
+
+		model.addAttribute("nacimientoDTO", nacimientoDTO);	// Enviar nacimientoDTO
 		model.addAttribute("titulo", "Registrar Nacimiento");	// Enviar titulo del formulario
 		model.addAttribute("accion", "/nacimientos/guardar");	// Enviar endpoint para guardar el nacimiento
 		model.addAttribute("listaMontas", montaService.obtenerMontas()); // Enviar lista de montas

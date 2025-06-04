@@ -37,7 +37,7 @@ public class MontaDTO {
 	private EstatusMonta estatus;
 
 	// ✅ Campo auxiliar para vista (no se guarda en DB)
-	//private boolean tieneNacimiento;
+	private boolean tieneNacimiento;
 	
 	// Relacion con ConejoDTO
 	

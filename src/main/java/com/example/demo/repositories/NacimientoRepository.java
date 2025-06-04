@@ -11,7 +11,7 @@ import com.example.demo.models.NacimientoModel;
 @Repository
 public interface NacimientoRepository extends CrudRepository<NacimientoModel, Long> {
 
-    boolean existsByMonta(MontaModel monta);
+    boolean existsByMontaId(Long id);
 
     Optional<NacimientoModel> findByMonta(MontaModel montaModel);
 

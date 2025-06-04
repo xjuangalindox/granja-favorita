@@ -3,7 +3,10 @@ package com.example.demo.services;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.demo.controllers.dto.MontaDTO;
 import com.example.demo.controllers.dto.NacimientoDTO;
+import com.example.demo.models.MontaModel;
+import com.example.demo.models.NacimientoModel;
 
 public interface INacimientoService {
     
@@ -26,4 +29,7 @@ public interface INacimientoService {
     public boolean eliminarNacimientoById(Long id);
 
     public boolean existsById(Long id);
+
+    // Editar nacimiento desde: "/montas"
+    public Optional<NacimientoDTO> findByMonta(MontaDTO montaDTO);
 }

@@ -90,10 +90,8 @@
                             onclick="return confirm('¿Seguro que deseas eliminar esta monta?')">Eliminar</a>
                     </td>
                     <td>
-                        <a href="#" class="btn btn-success">Registrar</a>
-                        <a href="#" class="btn btn-info">Editar</a>
-                        <!--<a th:if="${item.tieneNacimiento == true}" th:href="@{/nacimientos/por-monta/{idMonta}(idMonta=${item.id})}" class="btn btn-secondary">Mostrar</a>--> 
-                        <!--<a th:if="${item.tieneNacimiento == false}" th:href="@{/nacimientos/crear/{id}(id=${item.id})}" class="btn btn-success">Registrar</a>--> 
+                        <a th:if="${item.tieneNacimiento == false}" th:href="@{/nacimientos/crear(idMonta=${item.id})}" class="btn btn-success">Registrar</a>
+                        <a th:if="${item.tieneNacimiento == true}" th:href="@{/nacimientos/editar/por-monta/{idMonta}(idMonta=${item.id})}" class="btn btn-secondary">Mostrar</a>
                     </td>
                 </tr>
             </tbody>

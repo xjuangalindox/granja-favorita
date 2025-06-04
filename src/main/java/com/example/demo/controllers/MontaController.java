@@ -1,6 +1,7 @@
 package com.example.demo.controllers;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,10 +85,15 @@ public class MontaController {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	@GetMapping("/montas/editar/{id}")
-	public String formularioEditar(@PathVariable("id") Long id, Model model){
-		MontaDTO montaDTO = montaService.obtenerMontaById(id);	// Obtener informacion de la BD
+	public String formularioEditar(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes){
 
-		model.addAttribute("montaDTO", montaDTO);	// Enviar plantilla con la informacion
+		Optional<MontaDTO> montaOpt = montaService.obtenerMontaById(id);
+		if(montaOpt.isEmpty()){
+			redirectAttributes.addFlashAttribute("error", "La monta con ID "+id+" no fue encontrada.");
+			return "redirect:/montas";
+		}
+
+		model.addAttribute("montaDTO", montaOpt.get());	// Enviar plantilla con la informacion
 		model.addAttribute("titulo", "Editar Monta");	// Enviar titulo del formulario
 		model.addAttribute("accion", "/montas/editar/"+id);	// Enviar endpoint para editar
 		model.addAttribute("listaEstatus", EstatusMonta.values()); // Enviar lista de EstatusMonta

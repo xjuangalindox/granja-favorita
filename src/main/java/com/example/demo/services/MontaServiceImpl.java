@@ -2,6 +2,7 @@ package com.example.demo.services;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -35,25 +36,18 @@ public class MontaServiceImpl implements IMontaService{
         .map(item -> modelMapper.map(item, MontaDTO.class))
         .collect(Collectors.toList());
 
-        /*for(MontaDTO item : dtosList){
-            //  Existe nacimiento por MontaModel - Conversion de MontaDTO a MontaModel
-            boolean nacimiento = nacimientoRepository.existsByMonta(modelMapper.map(item, MontaModel.class));
-            //  Asignar true o false a "tieneNacimiento"
-            item.setTieneNacimiento(nacimiento);
-        }*/
+        // ¿La monta tiene nacimiento?
+        for(MontaDTO item : dtosList){
+            item.setTieneNacimiento(nacimientoRepository.existsByMontaId(item.getId()));
+        }
 
-        // Retornar montas con valor en "tieneNacimiento"
         return dtosList;
     }
 
     @Override
-    public MontaDTO obtenerMontaById(Long id) {
-        MontaModel montaModel = montaRepository.findById(id).orElse(null);
-        
-        // Conversion de MontaModel a MontaDTO
-        MontaDTO montaDTO = modelMapper.map(montaModel, MontaDTO.class);
-
-        return montaDTO;
+    public Optional<MontaDTO> obtenerMontaById(Long id) {
+        return montaRepository.findById(id)
+            .map(model -> modelMapper.map(model, MontaDTO.class));
     }
 
     @Override
