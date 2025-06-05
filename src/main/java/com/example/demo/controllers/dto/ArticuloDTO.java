@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class ArticuloDTO {
+    
     private Long id;
 
     private String nombre;

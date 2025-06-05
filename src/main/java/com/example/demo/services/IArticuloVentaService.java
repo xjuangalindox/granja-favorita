@@ -1,11 +1,17 @@
 package com.example.demo.services;
 
+import java.util.Optional;
+
 import com.example.demo.controllers.dto.ArticuloVentaDTO;
 
 public interface IArticuloVentaService {
+
+    public Optional<ArticuloVentaDTO> obtenerArticuloVentaPorId(Long id);
+
+    public ArticuloVentaDTO guardarArticuloVenta(ArticuloVentaDTO articuloVentaDTO);
+
     public boolean eliminarArticuloVentaPorId(Long id);
 
-    public ArticuloVentaDTO editarArticuloVenta(ArticuloVentaDTO articuloVentaDTO);
+    public ArticuloVentaDTO editarArticuloVenta(Long id, ArticuloVentaDTO articuloVentaDTO);
 
-    public ArticuloVentaDTO agregarArticuloVenta(ArticuloVentaDTO articuloVentaDTO, Long id);
 }

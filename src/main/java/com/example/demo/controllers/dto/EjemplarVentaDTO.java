@@ -9,16 +9,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class ArticuloVentaDTO {
+public class EjemplarVentaDTO {
 
     private Long id;
 
-    private Integer cantidad;
-    private Double subtotal;
+    private Double precio;
 
     // RELATIONS
-    private ArticuloDTO articulo;
-
+    EjemplarDTO ejemplar;
+    
     @JsonIgnore
-    private VentaDTO venta;
+    VentaDTO venta;
 }

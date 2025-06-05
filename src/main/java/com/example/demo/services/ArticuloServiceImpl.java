@@ -1,6 +1,8 @@
 package com.example.demo.services;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -23,19 +25,18 @@ public class ArticuloServiceImpl implements IArticuloService{
     @Override
     public List<ArticuloDTO> obtenerArticulos() {
         List<ArticuloModel> listaArticulos = (List<ArticuloModel>) articuloRepository.findAll();
+        listaArticulos.sort(Comparator.comparing(item -> item.getNombre()));
         
         //Tranformar de List<ArticuloModel> a List<ArticuloDTO>
         return listaArticulos.stream()
-        .map(item -> modelMapper.map(item, ArticuloDTO.class))
-        .collect(Collectors.toList());    
+            .map(item -> modelMapper.map(item, ArticuloDTO.class))
+            .collect(Collectors.toList());    
     }
 
     @Override
-    public ArticuloDTO obtenerPorId(Long id) {
-        ArticuloModel articuloModel = articuloRepository.findById(id).orElse(null);
-        
-        //Tranformar de ArticuloModel a ArticuloDTO
-        return modelMapper.map(articuloModel, ArticuloDTO.class);
+    public Optional<ArticuloDTO> obtenerPorId(Long id) {
+        return articuloRepository.findById(id)
+            .map(model -> modelMapper.map(model, ArticuloDTO.class));
     }
 
     @Override

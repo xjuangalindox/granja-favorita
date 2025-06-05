@@ -8,6 +8,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import com.example.demo.models.enums.EstatusVenta;
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,14 +23,14 @@ public class VentaDTO {
     private String nombreCliente;
     private String vinculoContacto; //"FACEBOOK", "WHATSAPP", "FACEBOOK Y WHATSAPP"
     private String telefono;
-
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime fechaEntrega;
     private String lugarEntrega;
     private double totalVenta;
     private String nota;
+    @Enumerated(EnumType.STRING)
     private EstatusVenta estatus;   //PENDIENTE, APARTADO, ENTREGADO
 
-    private List<ArticuloVentaDTO> articulos = new ArrayList<>();
-    private List<EjemplarDTO> ejemplares = new ArrayList<>();
+    private List<ArticuloVentaDTO> articulosVenta = new ArrayList<>();
+    private List<EjemplarVentaDTO> ejemplaresVenta = new ArrayList<>();
 }

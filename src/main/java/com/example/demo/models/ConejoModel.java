@@ -32,19 +32,16 @@ public class ConejoModel {
 	private Double peso;
 	private boolean activo;
 	private String nota;
-
 	@Column(name = "nombre_imagen")
 	private String nombreImagen;
-
 	@Column(name = "fecha_nacimiento")
 	private LocalDate fechaNacimiento;
-
 	@Column(name = "total_nacimientos")
 	private Integer totalNacimientos;
-
 	@Column(name = "total_gazapos")
 	private Integer totalGazapos;
 
+	// RELATIONS
 	@ManyToOne
 	@JoinColumn(name = "id_raza")
 	private RazaModel raza;

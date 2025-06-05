@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.FilenameUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,42 +25,6 @@ import jakarta.persistence.EntityNotFoundException;
 @Service
 public class VentaServiceImpl implements IVentaService {
 
-    @Override
-    public List<VentaDTO> obtenerVentas() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'obtenerVentas'");
-    }
-
-    @Override
-    public VentaDTO obtenerVentaPorId(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'obtenerVentaPorId'");
-    }
-
-    @Override
-    public VentaDTO guardarVenta(VentaDTO ventaDTO) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'guardarVenta'");
-    }
-
-    @Override
-    public VentaDTO actualizarDatosPrincipales(Long id, VentaDTO ventaDTO) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'actualizarDatosPrincipales'");
-    }
-
-    @Override
-    public VentaDTO editarVenta(Long id, VentaDTO ventaDTO) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'editarVenta'");
-    }
-
-    @Override
-    public boolean eliminarVenta(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'eliminarVenta'");
-    }
-/* 
     @Autowired
     private VentaRepository ventaRepository;
 
@@ -69,22 +33,72 @@ public class VentaServiceImpl implements IVentaService {
 
     @Override
     public List<VentaDTO> obtenerVentas() {
-        List<VentaModel> listaVentas = ventaRepository.findAllByOrderByFechaEntregaDesc();
+        List<VentaModel> listaVentas = (List<VentaModel>) ventaRepository.findAll();
+        listaVentas.sort(Comparator.comparing(item -> item.getFechaEntrega()));
 
-        // Tranformar de List<VentaModel> a List<VentaDTO>
         return listaVentas.stream()
-                .map(item -> modelMapper.map(item, VentaDTO.class))
-                .collect(Collectors.toList());
+            .map(item -> modelMapper.map(item, VentaDTO.class))
+            .collect(Collectors.toList());
     }
 
     @Override
-    public VentaDTO obtenerVentaPorId(Long id) {
-        VentaModel ventaModel = ventaRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Venta no encontrada"));
+    public Optional<VentaDTO> obtenerVentaPorId(Long id) {
+        return ventaRepository.findById(id)
+            .map(model -> modelMapper.map(model, VentaDTO.class));
+    }
 
-        // Tranformar de VentaModel a VentaDTO
+    @Override
+    public VentaDTO guardarVenta(VentaDTO ventaDTO) {
+        VentaDTO venta = new VentaDTO();
+        venta.setNombreCliente(ventaDTO.getNombreCliente());
+        venta.setVinculoContacto(ventaDTO.getVinculoContacto());
+        venta.setTelefono(ventaDTO.getTelefono());
+        venta.setFechaEntrega(ventaDTO.getFechaEntrega());
+        venta.setLugarEntrega(ventaDTO.getLugarEntrega());
+        venta.setTotalVenta(ventaDTO.getTotalVenta());
+        venta.setNota(ventaDTO.getNota());
+        venta.setEstatus(ventaDTO.getEstatus());
+
+        VentaModel ventaModel = modelMapper.map(venta, VentaModel.class);
+        ventaModel = ventaRepository.save(ventaModel);
+
         return modelMapper.map(ventaModel, VentaDTO.class);
     }
+
+    @Override
+    public VentaDTO actualizarDatosPrincipales(Long id, VentaDTO ventaDTO) {
+        return null;
+    }
+
+    @Override
+    public VentaDTO editarVenta(Long id, VentaDTO ventaDTO) {
+        Optional<VentaDTO> ventaOpt = obtenerVentaPorId(id);
+        if(ventaOpt.isEmpty()){
+            throw new RuntimeException("Venta no encontrada.");
+        }
+
+        VentaDTO venta = ventaOpt.get();
+        venta.setNombreCliente(ventaDTO.getNombreCliente());
+        venta.setVinculoContacto(ventaDTO.getVinculoContacto());
+        venta.setTelefono(ventaDTO.getTelefono());
+        venta.setFechaEntrega(ventaDTO.getFechaEntrega());
+        venta.setLugarEntrega(ventaDTO.getLugarEntrega());
+        venta.setTotalVenta(ventaDTO.getTotalVenta());
+        venta.setNota(ventaDTO.getNota());
+        venta.setEstatus(ventaDTO.getEstatus());
+
+        VentaModel ventaModel = modelMapper.map(venta, VentaModel.class);
+        ventaModel = ventaRepository.save(ventaModel);
+
+        return modelMapper.map(ventaModel, VentaDTO.class);
+    }
+
+    @Override
+    public boolean eliminarVenta(Long id) {
+        return false;
+    }
+
+/* 
 
     @Override
     public VentaDTO guardarVenta(VentaDTO ventaDTO) {

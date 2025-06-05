@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 public class RazaDTO {
     
     private Long id;
+    
     private String nombre;
 }

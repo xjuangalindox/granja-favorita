@@ -13,26 +13,25 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "articulos_venta")
+@Table(name = "ejemplares_venta")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class ArticuloVentaModel {
+public class EjemplarVentaModel {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Integer cantidad;
-    private Double subtotal;
+    private Double precio;
 
     // RELATIONS
     @ManyToOne
-    @JoinColumn(name = "articulo_id", nullable = false)
-    private ArticuloModel articulo;
-
+    @JoinColumn(name = "ejemplar_id", nullable = false)
+    EjemplarModel ejemplar;
+    
     @ManyToOne
     @JoinColumn(name = "venta_id", nullable = false)
-    private VentaModel venta;
+    VentaModel venta;
 }

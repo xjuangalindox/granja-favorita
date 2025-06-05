@@ -9,6 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import com.example.demo.models.enums.EstatusVenta;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -32,19 +33,23 @@ public class VentaModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "nombre_cliente")
     private String nombreCliente;
+    @Column(name = "vinculo_contacto")
     private String vinculoContacto; //"FACEBOOK", "WHATSAPP", "FACEBOOK Y WHATSAPP"
     private String telefono;
+    @Column(name = "fecha_entrega")
     private LocalDateTime fechaEntrega;
+    @Column(name = "lugar_entrega")
     private String lugarEntrega;
+    @Column(name = "total_venta")
     private double totalVenta;
     private String nota;
     private EstatusVenta estatus;   //PENDIENTE, APARTADO, ENTREGADO
 
-    /* 
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ArticuloVentaModel> articulos = new ArrayList<>();
+    private List<ArticuloVentaModel> articulosVenta = new ArrayList<>();
 
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<EjemplarModel> ejemplares = new ArrayList<>();*/
+    private List<EjemplarVentaModel> ejemplaresVenta = new ArrayList<>();
 }

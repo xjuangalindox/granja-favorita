@@ -1,18 +1,15 @@
 package com.example.demo.services;
 
+import java.util.Optional;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.controllers.dto.ArticuloDTO;
 import com.example.demo.controllers.dto.ArticuloVentaDTO;
-import com.example.demo.models.ArticuloModel;
 import com.example.demo.models.ArticuloVentaModel;
-import com.example.demo.models.VentaModel;
-import com.example.demo.repositories.ArticuloRepository;
 import com.example.demo.repositories.ArticuloVentaRepository;
-import com.example.demo.repositories.VentaRepository;
-
-import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class ArticuloVentaServiceImpl implements IArticuloVentaService{
@@ -24,10 +21,7 @@ public class ArticuloVentaServiceImpl implements IArticuloVentaService{
     private ModelMapper modelMapper;
 
     @Autowired
-    private VentaRepository ventaRepository;
-
-    @Autowired
-    private ArticuloRepository articuloRepository;
+    private IArticuloService articuloService;
 
     @Override
     public boolean eliminarArticuloVentaPorId(Long id) {
@@ -39,49 +33,54 @@ public class ArticuloVentaServiceImpl implements IArticuloVentaService{
     }
 
     @Override
-    public ArticuloVentaDTO editarArticuloVenta(ArticuloVentaDTO articuloVentaDTO) {
-        // Obtener ArticuloVentaModel con ID
-        ArticuloVentaModel articuloVentaModel = articuloVentaRepository.findById(articuloVentaDTO.getId()).
-            orElseThrow(() -> new EntityNotFoundException("ArticuloVenta no encontrado"));
+    public ArticuloVentaDTO editarArticuloVenta(Long id, ArticuloVentaDTO articuloVentaDTO) {
 
-        // Setear informacion de ArticuloVentaDTO a ArticuloVentaModel
-        articuloVentaModel.setCantidad(articuloVentaDTO.getCantidad());
-        articuloVentaModel.setSubtotal(articuloVentaDTO.getSubtotal());
+        Optional<ArticuloVentaDTO> articuloVentaOpt = obtenerArticuloVentaPorId(id);
+        if(articuloVentaOpt.isEmpty()){
+            throw new RuntimeException("ArticuloVenta no encontrado.");
+        }
 
-        // Obtener y asignar Articulo a ArticuloVenta
-        ArticuloModel articuloModel = articuloRepository.findById(articuloVentaDTO.getArticulo().getId())
-            .orElseThrow(() -> new EntityNotFoundException("Articulo no encontrado"));
-        articuloVentaModel.setArticulo(articuloModel);
-        
-        // Persistir ArticuloVentaModel con la nueva informacion
-        ArticuloVentaModel guardado = articuloVentaRepository.save(articuloVentaModel);
+        Optional<ArticuloDTO> articuloOpt = articuloService.obtenerPorId(articuloVentaDTO.getArticulo().getId());
+        if(articuloOpt.isEmpty()){
+            throw new RuntimeException("Articulo no encontrado.");
+        }
 
-        // Mapear ArticuloVentaModel a ArticuloVentaDTO y retornar
-        return modelMapper.map(guardado, ArticuloVentaDTO.class);
+        ArticuloVentaDTO articuloVenta = articuloVentaOpt.get();
+        articuloVenta.setCantidad(articuloVentaDTO.getCantidad());
+        articuloVenta.setSubtotal(articuloVentaDTO.getSubtotal());
+        articuloVenta.setArticulo(articuloOpt.get());
+        //articuloVenta.setVenta(articuloVentaDTO.getVenta());
+
+        ArticuloVentaModel articuloVentaModel = modelMapper.map(articuloVenta, ArticuloVentaModel.class);
+        articuloVentaModel = articuloVentaRepository.save(articuloVentaModel);
+
+        return modelMapper.map(articuloVentaModel, ArticuloVentaDTO.class);
     }
 
     @Override
-    public ArticuloVentaDTO agregarArticuloVenta(ArticuloVentaDTO articuloVentaDTO, Long id) {
-        // Setear informacion del ArticuloVentaDTO a ArticuloVentaModel
-        ArticuloVentaModel articuloVentaModel = new ArticuloVentaModel();
-        articuloVentaModel.setCantidad(articuloVentaDTO.getCantidad());
-        articuloVentaModel.setSubtotal(articuloVentaDTO.getSubtotal());
+    public ArticuloVentaDTO guardarArticuloVenta(ArticuloVentaDTO articuloVentaDTO) {
+        
+        Optional<ArticuloDTO> articuloOpt = articuloService.obtenerPorId(articuloVentaDTO.getArticulo().getId());
+        if(articuloOpt.isEmpty()){
+            throw new RuntimeException("Articulo no encontrado");
+        }
 
-        // Obtener y asignar ArticuloModel a ArticuloVentaModel
-        ArticuloModel articuloModel = articuloRepository.findById(articuloVentaDTO.getArticulo().getId())
-            .orElseThrow(() -> new EntityNotFoundException("Articulo no encontrado"));
-        articuloVentaModel.setArticulo(articuloModel);
+        ArticuloVentaDTO articuloVenta = new ArticuloVentaDTO();
+        articuloVenta.setCantidad(articuloVentaDTO.getCantidad());
+        articuloVenta.setSubtotal(articuloVentaDTO.getSubtotal());
+        articuloVenta.setArticulo(articuloOpt.get());
+        articuloVenta.setVenta(articuloVentaDTO.getVenta());
 
-        // Obtener y asignar VentaModel a ArticuloVentaModel
-        VentaModel ventaModel = ventaRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Venta no encontrada"));
-        articuloVentaModel.setVenta(ventaModel);
+        ArticuloVentaModel articuloVentaModel = modelMapper.map(articuloVenta, ArticuloVentaModel.class);
+        articuloVentaModel = articuloVentaRepository.save(articuloVentaModel);
+        
+        return modelMapper.map(articuloVentaModel, ArticuloVentaDTO.class);
+    }
 
-        // Persistir ArticuloVentaModel
-        ArticuloVentaModel guardado = articuloVentaRepository.save(articuloVentaModel);
-
-        // Mapear de ArticuloVentaModel a ArticuloVentaDTO
-        return modelMapper.map(guardado, ArticuloVentaDTO.class);
+    @Override
+    public Optional<ArticuloVentaDTO> obtenerArticuloVentaPorId(Long id) {
+        return articuloVentaRepository.findById(id)
+            .map(model -> modelMapper.map(model, ArticuloVentaDTO.class));
     }
     
 }

@@ -14,6 +14,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @Data
 public class EjemplarDTO {
+
     private Long id;
 
     @JsonIgnore
@@ -24,7 +25,7 @@ public class EjemplarDTO {
     private boolean disponible;
 
     @JsonIgnore
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
+    //@ToString.Exclude
+    //@EqualsAndHashCode.Exclude
     private NacimientoDTO nacimiento;
 }
