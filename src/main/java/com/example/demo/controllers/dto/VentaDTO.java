@@ -26,7 +26,7 @@ public class VentaDTO {
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime fechaEntrega;
     private String lugarEntrega;
-    private double totalVenta;
+    private Double totalVenta;
     private String nota;
     @Enumerated(EnumType.STRING)
     private EstatusVenta estatus;   //PENDIENTE, APARTADO, ENTREGADO

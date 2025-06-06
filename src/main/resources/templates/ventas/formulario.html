@@ -77,11 +77,11 @@
                         <div class="col-md-8">
 
                             <!--ARTICULOS DISPONIBLES-->
-                            <h5>Artículos Disponibles</h5>
+                            <h5>Artículos</h5>
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th scope="col">Artículo</th>
+                                        <th scope="col">Artículo</th> <!-- ArticuloDTO -->
                                         <th style="width: 100px;">Cantidad</th>
                                         <th style="width: 100px;">Subtotal</th>
                                         <th style="width: 50px;"></th> <!--Boton Eliminar-->
@@ -100,7 +100,7 @@
                             <hr class="border border-primary border-3 opacity-75">
 
                             <!--EJEMPLARES INFORMACION-->
-                            <h5>Nacimientos Disponibles</h5>
+                            <h5>Nacimientos</h5>
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
@@ -139,8 +139,8 @@
         let listaArticulos = /*[[${listaArticulos}]]*/ [];
         let listaNacimientos = /*[[${listaNacimientos}]]*/ [];
 
-        let ventaArticulos = /*[[${ventaDTO.articulos}]]*/ [];
-        let ventaEjemplares = /*[[${ventaDTO.ejemplares}]]*/ [];
+        let articulosVenta = /*[[${ventaDTO.articulosVenta}]]*/ [];
+        let ejemplaresVenta = /*[[${ventaDTO.ejemplaresVenta}]]*/ [];
         
         //ventaArticulos = ventaArticulos || [];
         //ventaEjemplares = ventaEjemplares || [];

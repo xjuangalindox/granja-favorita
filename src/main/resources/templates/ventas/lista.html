@@ -40,7 +40,6 @@
                     <th scope="col">Lugar Entrega</th>
                     <th scope="col">Total</th>
                     <th scope="col">Nota</th>
-                    <th scope="col">Estatus</th>
                     <th scope="col">Acciones</th>
                 </tr>
             </thead>
@@ -51,35 +50,14 @@
                     (${item.estatus.name == 'PENDIENTE'} ? 'table-danger' : ''))
                     ">
                 
-                    <div th:if="${item.nombreCliente != null}">
-                        <td th:text="${item.nombreCliente}"></td>
-                    </div>
-                    <div th:if="${item.vinculoContacto != null}">
-                        <td th:text="${item.vinculoContacto}"></td>
-                    </div>
-                    <div th:if="${item.telefono != null}">
-                        <td th:text="${item.telefono}"></td>
-                    </div>
+                    <td th:text="${item.nombreCliente}"></td>
+                    <td th:text="${item.vinculoContacto}"></td>
+                    <td th:text="${item.telefono}"></td>
+                    <td th:text="${#temporals.format(item.fechaEntrega, 'dd/MMMM/yyyy hh:mm a')}"></td>
+                    <td th:text="${item.lugarEntrega}"></td>
+                    <td th:text="'$' + ${item.totalVenta}"></td>
+                    <td th:text="${item.nota}"></td>
                     
-                    <div th:if="${item.fechaEntrega != null}">
-                        <td th:text="${#temporals.format(item.fechaEntrega, 'dd/MMMM/yyyy hh:mm a')}"></td>
-                    </div>
-
-                    <div th:if="${item.lugarEntrega != null}">
-                        <td th:text="${item.lugarEntrega}"></td>
-                    </div>
-
-                    <div th:if="${item.totalVenta != null}">
-                        <td th:text="'$' + ${item.totalVenta}"></td>
-                    </div>
-                    
-                    <div th:if="${item.nota != null}">
-                        <td th:text="${item.nota}"></td>
-                    </div>
-                    <div th:if="${item.estatus != null}">
-                        <td th:text="${item.estatus}"></td>
-                    </div>
-
                     <td>
                         <a th:href="@{/ventas/editar/{id}(id=${item.id})}" class="btn btn-info">Editar</a>
                         <a th:href="@{/ventas/eliminar/{id}(id=${item.id})}" class="btn btn-danger" 

@@ -3,11 +3,11 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 window.addEventListener('DOMContentLoaded', () => {    
-    if(ventaArticulos.length > 0){
-        ventaArticulos.forEach(art => agregarArticuloExistente(art));
+    if(articulosVenta.length > 0){
+        articulosVenta.forEach(art => agregarArticuloExistente(art));
     }
-    if(ventaEjemplares.length > 0){
-        ventaEjemplares.forEach(eje => agregarEjemplarExistente(eje));
+    if(ejemplaresVenta.length > 0){
+        ejemplaresVenta.forEach(eje => agregarEjemplarExistente(eje));
     }
 });
 
@@ -37,17 +37,17 @@ function agregarArticulo() {
     const row = document.createElement('tr');
     row.innerHTML = `
         <td>
-            <select name="articulos[${contArticulo}].articulo.id" class="form-select" required>
+            <select name="articulosVenta[${contArticulo}].articulo.id" class="form-select" required>
                 ${opciones}
             </select>
         </td>
         <td>
-            <input type="number" name="articulos[${contArticulo}].cantidad" class="form-control" min="1" 
+            <input type="number" name="articulosVenta[${contArticulo}].cantidad" class="form-control" min="1" 
                 required oninput="actualizarSubtotal(this)">
         </td>
         <td>
-            <input type="number" name="articulos[${contArticulo}].subtotal" class="form-control" 
-                required readonly>
+            <input type="number" name="articulosVenta[${contArticulo}].subtotal" class="form-control"
+                readonly required>
         </td>
 
         <td>
@@ -136,20 +136,20 @@ function agregarArticuloExistente(art) {
     const row = document.createElement('tr');
     row.innerHTML = `
         <!-- Campo oculto para el id del articulo -->
-        <input type="hidden" name="articulos[${contArticulo}].id" value="${art.id}"/>
+        <input type="hidden" name="articulosVenta[${contArticulo}].id" value="${art.id}"/>
 
         <td>
-            <select name="articulos[${contArticulo}].articulo.id" class="form-select" required>
+            <select name="articulosVenta[${contArticulo}].articulo.id" class="form-select" required>
                 ${opciones}
             </select>
         </td>
         <td>
-            <input type="number" name="articulos[${contArticulo}].cantidad" class="form-control" value="${art.cantidad}" 
-                min="1" required oninput="actualizarSubtotal(this)">
+            <input type="number" name="articulosVenta[${contArticulo}].cantidad" class="form-control" value="${art.cantidad}" min="1" 
+                required oninput="actualizarSubtotal(this)">
         </td>
         <td>
-            <input type="number" name="articulos[${contArticulo}].subtotal" class="form-control" value="${art.subtotal}" 
-                readonly required >
+            <input type="number" name="articulosVenta[${contArticulo}].subtotal" class="form-control" value="${art.subtotal}" 
+                readonly required>
         </td>
 
         <td>
@@ -242,14 +242,14 @@ function mostrarVistaPrevia(input) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//REGISTRAR ARTICULOS Y EJEMPLARES ELIMINADOS
+//REGISTRAR ARTICULOS Y EJEMPLARES ELIMINADOS (bien)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 let articulosEliminados = [];
 let ejemplaresEliminados = [];
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//ELIMINAR ARTICULO Y EJEMPLAR
+//ELIMINAR ARTICULO Y EJEMPLAR (bien)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function eliminarArticulo(boton) {
@@ -283,7 +283,7 @@ function eliminarEjemplar(boton) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//AGREGAR LOS IDs ELIMINADOS COMO INPUTS OCULTOS
+//AGREGAR LOS IDs ELIMINADOS COMO INPUTS OCULTOS (Bien)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 document.getElementById("formVenta").addEventListener("submit", function () {
