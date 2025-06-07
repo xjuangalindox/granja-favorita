@@ -94,7 +94,7 @@ function agregarEjemplar() {
             </select>
         </td>
         <td>
-            <input type="number" name="ejemplares[${contEjemplar}].precio" class="form-control" min="0" 
+            <input type="number" name="ejemplaresVenta[${contEjemplar}].precio" class="form-control" min="0" 
                 required oninput="actualizarTotalVenta()">
         </td>
         <td>
@@ -332,3 +332,105 @@ function actualizarTotalVenta() {
 
     document.querySelector('input[name="totalVenta"]').value = total.toFixed(2);
 }
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//CODIGO CHATGPT
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+let contadorBloques = 0;
+
+function agregarBloqueNacimiento() {
+    const bloqueId = contadorBloques++;
+    const contenedor = document.getElementById('bloquesNacimientos');
+
+    const bloque = document.createElement('div');
+    bloque.classList.add('mb-4', 'border', 'p-3', 'rounded');
+    bloque.dataset.bloqueId = bloqueId;
+
+    const selectHtml = listaNacimientos.map(n => `
+        <option value="${n.id}">
+            ${n.monta.macho.nombre} - ${n.monta.hembra.nombre} (${n.fechaNacimiento})
+        </option>
+        `).join('');
+
+    bloque.innerHTML = `
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="flex-grow-1 me-3">
+
+            <select class="form-select nacimiento-select" onchange="mostrarEjemplares(${bloqueId}, this.value)">
+                <option value="">Selecciona un nacimiento</option>
+                ${selectHtml}
+            </select>
+
+            </div>
+                <button type="button" class="btn btn-danger mt-4" onclick="eliminarBloque(${bloqueId})">Eliminar</button>
+            </div>
+
+            <div class="row ejemplares-contenedor" id="ejemplares-${bloqueId}">
+                <!-- Aqui van los ejemplares dinámicamente -->
+            </div>
+    `;
+
+    contenedor.appendChild(bloque);
+}
+
+function mostrarEjemplares(bloqueId, nacimientoId) {
+    const contenedor = document.getElementById(`ejemplares-${bloqueId}`);
+    contenedor.innerHTML = '';
+
+    const nacimiento = listaNacimientos.find(n => n.id == nacimientoId);
+    if (!nacimiento) return;
+
+    nacimiento.ejemplares.forEach(ejemplar => {
+    const col = document.createElement('div');
+    col.classList.add('col-md-6');
+
+    col.innerHTML = `
+        <div class="ejemplar-card d-flex align-items-center">
+
+            <input type="checkbox" class="form-check-input me-2" name="bloque-${bloqueId}-ejemplar" value="${ejemplar.id}">
+
+            <a href="/img/ejemplares/${ejemplar.nombreImagen}"  target="_blank">
+                <img src="/img/ejemplares/${ejemplar.nombreImagen}"  
+                    class="img-thumbnail vista-previa" 
+                    style="max-width: 100px; max-height: 100px; object-fit: cover;"/>
+            </a>
+
+            <div>
+                <p class="mb-1"><strong>Sexo:</strong> ${ejemplar.sexo}</p>
+
+                <label class="form-label mb-0">Precio:</label>
+                <input type="number" class="form-control form-control-sm" name="precio-${ejemplar.id}" min="0" required>
+            </div>
+
+        </div>
+    `;
+    contenedor.appendChild(col);
+    });
+}
+
+function eliminarBloque(id) {
+    const bloque = document.querySelector(`[data-bloque-id="${id}"]`);
+    if (bloque) bloque.remove();
+}
+
+document.getElementById('formVenta').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const seleccionados = [];
+    document.querySelectorAll('[data-bloque-id]').forEach(bloque => {
+    const bloqueId = bloque.dataset.bloqueId;
+    const nacimientoSelect = bloque.querySelector('.nacimiento-select');
+    const nacimientoId = nacimientoSelect.value;
+
+    bloque.querySelectorAll(`input[name="bloque-${bloqueId}-ejemplar"]:checked`).forEach(checkbox => {
+        const ejemplarId = checkbox.value;
+        const precio = document.querySelector(`input[name="precio-${ejemplarId}"]`)?.value;
+        seleccionados.push({ nacimientoId, ejemplarId, precio });
+    });
+    });
+
+    console.log("Ejemplares seleccionados:", seleccionados);
+    alert("Consulta la consola para ver la selección.");
+});
