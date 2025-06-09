@@ -22,7 +22,7 @@ public class EjemplarDTO {
     
     private String nombreImagen;
     private String sexo;
-    private boolean disponible;
+    private boolean vendido;
 
     @JsonIgnore
     //@ToString.Exclude

@@ -29,7 +29,7 @@ public class EjemplarModel {
     @Column(name = "nombre_imagen")
     private String nombreImagen;
     private String sexo;
-    private boolean disponible;
+    private boolean vendido;
 
     // RELATIONS
     @ManyToOne
