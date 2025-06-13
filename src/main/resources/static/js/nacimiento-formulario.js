@@ -41,7 +41,7 @@ function agregarEjemplar() {
             </select>
         </td>
         <td>
-            <input class="form-check-input" type="checkbox" name="ejemplares[${contador}].disponible" checked>
+            <input class="form-check-input" type="checkbox" name="ejemplares[${contador}].vendido">
         </td>
 
         <td>
@@ -86,7 +86,7 @@ function agregarEjemplarExistente(eje) {
             </select>
         </td>
         <td>
-            <input class="form-check-input" type="checkbox" name="ejemplares[${contador}].disponible" ${eje.disponible ? 'checked' : ''}>
+            <input class="form-check-input" type="checkbox" name="ejemplares[${contador}].vendido" ${eje.vendido ? 'checked' : ''}>
         </td>
 
         <td>

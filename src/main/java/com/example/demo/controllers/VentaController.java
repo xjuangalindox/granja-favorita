@@ -1,14 +1,17 @@
 package com.example.demo.controllers;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 
 import com.example.demo.controllers.dto.ArticuloVentaDTO;
 import com.example.demo.controllers.dto.EjemplarVentaDTO;
@@ -72,7 +75,6 @@ public class VentaController {
 
     @PostMapping("/ventas/guardar")
     public String guardarVenta(@ModelAttribute("ventaDTO") VentaDTO ventaDTO, Model model, RedirectAttributes redirectAttributes) {
-        
         VentaDTO venta;
         List<ArticuloVentaDTO> articulosVenta = new ArrayList<>();
         List<EjemplarVentaDTO> ejemplaresVenta = new ArrayList<>();
@@ -129,11 +131,21 @@ public class VentaController {
         }
 
         VentaDTO ventaDTO = ventaOpt.get();
+        Set<Long> idNacimientos = new HashSet<>();
+
+        // Obtener idNacimiento de cada EjemplarVenta (sin duplicados)
+        if(ventaDTO.getEjemplaresVenta() != null && !ventaDTO.getEjemplaresVenta().isEmpty()){
+            for(EjemplarVentaDTO eje : ventaDTO.getEjemplaresVenta()){
+                idNacimientos.add(eje.getEjemplar().getNacimiento().getId());
+            }
+        }
+
         model.addAttribute("ventaDTO", ventaDTO);
         model.addAttribute("titulo", "Editar Venta");
         model.addAttribute("accion", "/ventas/editar/"+id);
         model.addAttribute("listaArticulos", articuloService.obtenerArticulos());
         model.addAttribute("listaNacimientos", nacimientoService.obtenerNacimientos());
+        model.addAttribute("idNacimientos", idNacimientos);
 
         return "ventas/formulario";
     }
@@ -144,8 +156,14 @@ public class VentaController {
         @RequestParam(name = "ejemplaresVentaEliminados", required = false) List<Long> ejemplaresVentaEliminados,
         Model model, RedirectAttributes redirectAttributes) {
 
+        System.out.println("\n\n\n");
+        System.out.println("\n\n\n");
+        System.out.println(ventaDTO.toString());
+        System.out.println("\n\n\n");
+        System.out.println("\n\n\n");
+
         // Acceso desde la barra de direcciones
-        Optional<VentaDTO> ventaOpt = ventaService.obtenerVentaPorId(id);
+        /*Optional<VentaDTO> ventaOpt = ventaService.obtenerVentaPorId(id);
         if(ventaOpt.isEmpty()){
             redirectAttributes.addFlashAttribute("error", "Venta no encontrada.");
             return "redirect:/ventas";
@@ -208,7 +226,7 @@ public class VentaController {
 
             model.addAttribute("mensaje", "Ocurrio un error al editar la venta.");
             return "ventas/formulario";
-        }
+        }*/
 
         redirectAttributes.addFlashAttribute("ok", "Venta modificada correctamente.");
         return "redirect:/ventas";
@@ -246,7 +264,8 @@ public class VentaController {
 
     private List<ArticuloVentaDTO> filtrarArticulosNuevos(List<ArticuloVentaDTO> articulosVenta){
         return articulosVenta.stream()
-            .filter(item -> item.getId() == null &&
+            .filter(item -> 
+                item.getId() == null &&
                 item.getCantidad() != null &&
                 item.getSubtotal() != null &&
                 item.getArticulo() != null &&
@@ -266,10 +285,12 @@ public class VentaController {
 
     private List<EjemplarVentaDTO> filtrarEjemplaresNuevos(List<EjemplarVentaDTO> ejemplaresVenta) {
         return ejemplaresVenta.stream()
-            .filter(item -> item.getId() == null &&
-                item.getPrecio() != null &&
-                item.getEjemplar() != null &&
-                item.getEjemplar().getId() != null)
+            .filter(ejeVenta -> 
+                ejeVenta.getId() == null &&
+                ejeVenta.getPrecio() != null &&
+                ejeVenta.getEjemplar() != null &&
+                ejeVenta.getEjemplar().getId() != null &&
+                ejeVenta.getEjemplar().isVendido() == true)
             .collect(Collectors.toList());
     }
 

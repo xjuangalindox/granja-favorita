@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.PastOrPresent;
@@ -39,7 +41,10 @@ public class NacimientoDTO {
 	// RELACIONES
 	@Valid
 	private MontaDTO monta;
-
+	
 	@Valid
 	private List<EjemplarDTO> ejemplares;
+
+	//@JsonIgnore
+	//private VentaDTO venta;
 }

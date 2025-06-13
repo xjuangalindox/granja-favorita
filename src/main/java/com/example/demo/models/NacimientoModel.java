@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -43,9 +44,13 @@ public class NacimientoModel {
 
 	// RELACIONES
 	@OneToOne
-	@JoinColumn(name = "id_monta")
+	@JoinColumn(name = "monta_id", nullable = false)
 	private MontaModel monta;
 
 	@OneToMany(mappedBy = "nacimiento", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<EjemplarModel> ejemplares;
+
+	//@ManyToOne
+	//@JoinColumn(name = "venta_id")
+	//private VentaModel venta;
 }

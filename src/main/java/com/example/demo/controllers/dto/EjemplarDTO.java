@@ -6,9 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -24,8 +22,11 @@ public class EjemplarDTO {
     private String sexo;
     private boolean vendido;
 
+    // RELATIONS
+
     @JsonIgnore
+    private NacimientoDTO nacimiento;
+
     //@ToString.Exclude
     //@EqualsAndHashCode.Exclude
-    private NacimientoDTO nacimiento;
 }

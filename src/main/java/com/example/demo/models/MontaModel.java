@@ -43,6 +43,8 @@ public class MontaModel {
 	@Enumerated(EnumType.STRING)
 	private EstatusMonta estatus;
 
+	// RELATIONS
+
 	@ManyToOne(targetEntity = ConejoModel.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "id_hembra")
 	private ConejoModel hembra;

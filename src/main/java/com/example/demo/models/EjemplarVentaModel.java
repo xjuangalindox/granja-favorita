@@ -29,9 +29,9 @@ public class EjemplarVentaModel {
     // RELATIONS
     @ManyToOne
     @JoinColumn(name = "ejemplar_id", nullable = false)
-    EjemplarModel ejemplar;
+    private EjemplarModel ejemplar;
     
     @ManyToOne
     @JoinColumn(name = "venta_id", nullable = false)
-    VentaModel venta;
+    private VentaModel venta;
 }

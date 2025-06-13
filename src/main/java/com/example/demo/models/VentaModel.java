@@ -54,4 +54,7 @@ public class VentaModel {
 
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EjemplarVentaModel> ejemplaresVenta = new ArrayList<>();
+
+    //@OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
+    //private List<NacimientoModel> nacimientos = new ArrayList<>();
 }

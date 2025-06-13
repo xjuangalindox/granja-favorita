@@ -115,7 +115,7 @@ public class NacimientoServiceImpl implements INacimientoService{
                     EjemplarModel ejemplarModel = new EjemplarModel();
                     ejemplarModel.setNombreImagen(nombreImagen);
                     ejemplarModel.setSexo(item.getSexo());
-                    ejemplarModel.setDisponible(item.isDisponible());
+                    ejemplarModel.setVendido(item.isVendido());
                     ejemplarModel.setNacimiento(nacimientoModel);
 
                     // Pesistir y agregar a la lista de ejemplares (model)
@@ -239,7 +239,7 @@ public class NacimientoServiceImpl implements INacimientoService{
                     EjemplarModel ejemplarModel = new EjemplarModel();
                     ejemplarModel.setNombreImagen(nombreImagen);
                     ejemplarModel.setSexo(item.getSexo());
-                    ejemplarModel.setDisponible(item.isDisponible());
+                    ejemplarModel.setVendido(item.isVendido());
                     ejemplarModel.setNacimiento(nacimientoModel);
 
                     ejemplarRepository.save(ejemplarModel);
@@ -271,7 +271,7 @@ public class NacimientoServiceImpl implements INacimientoService{
                         ejemplarModel.setNombreImagen(nombreImagen);
                     }
                     ejemplarModel.setSexo(item.getSexo());
-                    ejemplarModel.setDisponible(item.isDisponible());
+                    ejemplarModel.setVendido(item.isVendido());
                     ejemplarModel.setNacimiento(nacimientoModel);
 
                     ejemplarRepository.save(ejemplarModel);
@@ -322,6 +322,15 @@ public class NacimientoServiceImpl implements INacimientoService{
 
         return nacimientoRepository.findByMonta(montaModel)
             .map(model -> modelMapper.map(model, NacimientoDTO.class));
+    }
+
+    @Override
+    public List<NacimientoDTO> obtenerNacimientosDisponibles() {
+        List<NacimientoModel> nacimientosConEjemplaresDisponibles = nacimientoRepository.findNacimientosConEjemplaresDisponibles();
+
+        return nacimientosConEjemplaresDisponibles.stream()
+            .map(item -> modelMapper.map(item, NacimientoDTO.class))
+            .collect(Collectors.toList());
     }
 
 }

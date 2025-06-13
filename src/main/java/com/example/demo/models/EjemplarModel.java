@@ -36,6 +36,10 @@ public class EjemplarModel {
     @JoinColumn(name = "nacimiento_id", nullable = false)
     private NacimientoModel nacimiento;
 
-    @OneToOne(mappedBy = "ejemplar") // Agregado
-    private EjemplarVentaModel ejemplarVenta; // Agregado
+    //@ManyToOne
+    //@JoinColumn(name = "venta_id") // Nullable, porque puede no estar vendido aún
+    //private VentaModel venta;
+
+    //@OneToOne(mappedBy = "ejemplar") // Agregado
+    //private EjemplarVentaModel ejemplarVenta; // Agregado
 }

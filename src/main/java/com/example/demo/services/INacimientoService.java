@@ -5,13 +5,13 @@ import java.util.Optional;
 
 import com.example.demo.controllers.dto.MontaDTO;
 import com.example.demo.controllers.dto.NacimientoDTO;
-import com.example.demo.models.MontaModel;
-import com.example.demo.models.NacimientoModel;
 
 public interface INacimientoService {
     
     // Obtener montas
     public List<NacimientoDTO> obtenerNacimientos();
+
+    public List<NacimientoDTO> obtenerNacimientosDisponibles();
 
     // Obtener por id monta
     public NacimientoDTO obtenerNacimientoPorIdMonta(Long id);

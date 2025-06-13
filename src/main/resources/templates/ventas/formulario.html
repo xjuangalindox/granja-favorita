@@ -25,7 +25,7 @@
                         <div class="col-md-4">
                             <div class="mb-3">
                                 <label class="form-label">Cliente</label>
-                                <input type="text" th:field="*{nombreCliente}" class="form-control" required>
+                                <input type="text" th:field="*{nombreCliente}" class="form-control" >
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Teléfono</label>
@@ -34,7 +34,7 @@
 
                             <div class="mb-3">
                                 <label for="precio" class="form-label">Contacto</label>
-                                <select class="form-select" th:field="*{vinculoContacto}" required>
+                                <select class="form-select" th:field="*{vinculoContacto}" >
                                     <option value="">Selecciona una opción</option>
                                     <option value="FACEBOOK">FACEBOOK</option>
                                     <option value="WHATSAPP">WHATSAPP</option>
@@ -44,7 +44,7 @@
 
                             <div class="mb-3">
                                 <label class="form-label">Fecha Entrega</label>
-                                <input class="form-control" type="datetime-local" th:field="*{fechaEntrega}" required>
+                                <input class="form-control" type="datetime-local" th:field="*{fechaEntrega}" >
                             </div>
 
                             <div class="mb-3">
@@ -54,7 +54,7 @@
 
                             <div class="mb-3">
                                 <label class="form-label">Total</label>
-                                <input class="form-control" type="number" th:field="*{totalVenta}" readonly required>
+                                <input class="form-control" type="number" th:field="*{totalVenta}" readonly >
                             </div>
 
                             <div class="mb-3">
@@ -77,7 +77,7 @@
                         <div class="col-md-8">
 
                             <!--ARTICULOS DISPONIBLES-->
-                            <h5>Artículos Disponibles</h5>
+                            <h5>Artículos disponibles</h5>
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
@@ -100,14 +100,14 @@
                             <hr class="border border-primary border-3 opacity-75">
 
                             <!-- ********** EJEMPLARES ********** -->
-                            <h5>Ejemplares por nacimiento</h5>
-                            <div id="bloquesNacimientos">
+                            <h5>Ejemplares disponibles</h5>
+                            <div id="nacimientosContainer">
                                 <!-- Aqui van los nacimientos dinámicamente -->
                             </div>
 
                             <!-- Boton Agregar Nacimiento -->
                             <div class="mb-3">
-                                <button type="button" class="btn btn-success" onclick="agregarBloqueNacimiento()">Agregar nacimiento</button>
+                                <button type="button" class="btn btn-success" onclick="agregarNacimiento()">Agregar nacimiento</button>
                             </div>
 
                             <!-- Botón para enviar el formulario al controller-->
@@ -127,6 +127,7 @@
     <script th:inline="javascript">
         let listaArticulos = /*[[${listaArticulos}]]*/ [];
         let listaNacimientos = /*[[${listaNacimientos}]]*/ [];
+        let idNacimientos = /*[[${idNacimientos}]]*/ [];
 
         let articulosVenta = /*[[${ventaDTO.articulosVenta}]]*/ [];
         let ejemplaresVenta = /*[[${ventaDTO.ejemplaresVenta}]]*/ [];
