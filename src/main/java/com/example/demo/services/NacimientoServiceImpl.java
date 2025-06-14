@@ -96,12 +96,12 @@ public class NacimientoServiceImpl implements INacimientoService{
             nacimientoDTO.setEjemplares(filtrarEjemplaresNuevos(nacimientoDTO.getEjemplares()));
         
             // ¿Existe algun ejemplar valido?
-            if(!nacimientoDTO.getEjemplares().isEmpty()){
+            if(nacimientoDTO.getEjemplares() != null && !nacimientoDTO.getEjemplares().isEmpty()){
                 List<EjemplarModel> ejemplares = new ArrayList<>();
 
                 String nombreConejo = montaModel.getMacho().getNombre();
                 String nombreConeja = montaModel.getHembra().getNombre();
-                LocalDate fechaNacimiento = nacimientoDTO.getFechaNacimiento();
+                LocalDate fechaNacimiento = nacimientoModel.getFechaNacimiento();
                 String nombreBase = nombreConejo +"_"+ nombreConeja +"_"+ fechaNacimiento;
 
                 for(EjemplarDTO item : nacimientoDTO.getEjemplares()){
@@ -125,7 +125,7 @@ public class NacimientoServiceImpl implements INacimientoService{
 
                 // Agregar lista de ejempalres (model) a NacimientoModel y persistir
                 nacimientoModel.setEjemplares(ejemplares);
-                nacimientoModel = nacimientoRepository.save(nacimientoModel);
+                //nacimientoModel = nacimientoRepository.save(nacimientoModel);
             }
 		}
 

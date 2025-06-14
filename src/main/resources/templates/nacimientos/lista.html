@@ -79,7 +79,7 @@
                     </div>
                 </td>
 
-                <td th:text="${item.fechaNacimiento}"></td>
+                <td th:text="${#temporals.format(item.fechaNacimiento, 'dd/MMMM/yyyy')}"></td>
                 <td th:text="${item.gazaposVivos}"></td>
                 <td th:text="${item.gazaposMuertos}"></td>
                 <td th:text="${item.nota}"></td>
