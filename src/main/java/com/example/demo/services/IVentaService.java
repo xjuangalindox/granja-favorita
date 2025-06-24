@@ -17,5 +17,5 @@ public interface IVentaService {
 
     public VentaDTO editarVenta(Long id, VentaDTO ventaDTO);
 
-    public boolean eliminarVenta(Long id);
+    public boolean eliminarVenta(VentaDTO ventaDTO);
 }

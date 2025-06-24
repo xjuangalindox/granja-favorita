@@ -1,6 +1,8 @@
 package com.example.demo.services;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +61,7 @@ public class EjemplarServiceImpl implements IEjemplarService{
         // Setear informacion de EjemplarDTO a EjemplarModel
         ejemplarModel.setNombreImagen(ejemplarDTO.getNombreImagen());
         ejemplarModel.setSexo(ejemplarDTO.getSexo());
-        //ejemplarModel.setPrecio(ejemplarDTO.getPrecio());
+        ejemplarModel.setVendido(ejemplarDTO.isVendido());
 
         // Asignar nuevo NacimientoModel a EjemplarModel
         NacimientoModel nacimientoModel = nacimientoRepository.findById(ejemplarDTO.getNacimiento().getId())
@@ -102,5 +104,14 @@ public class EjemplarServiceImpl implements IEjemplarService{
     public Optional<EjemplarDTO> obtenerEjemplarPorId(Long id) {
         return ejemplarRepository.findById(id)
             .map(model -> modelMapper.map(model, EjemplarDTO.class));
+    }
+
+    @Override
+    public List<EjemplarDTO> obtenerEjemplares() {
+        List<EjemplarModel> listaEjemplares = (List<EjemplarModel>) ejemplarRepository.findAll();
+
+        return listaEjemplares.stream()
+            .map(ejemplar -> modelMapper.map(ejemplar, EjemplarDTO.class))
+            .collect(Collectors.toList());
     }    
 }

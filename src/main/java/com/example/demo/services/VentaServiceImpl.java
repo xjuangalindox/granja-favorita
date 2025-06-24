@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +14,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.controllers.dto.ArticuloVentaDTO;
 import com.example.demo.controllers.dto.EjemplarDTO;
+import com.example.demo.controllers.dto.EjemplarVentaDTO;
 import com.example.demo.controllers.dto.VentaDTO;
 import com.example.demo.models.ArticuloVentaModel;
 import com.example.demo.models.EjemplarModel;
@@ -34,7 +37,8 @@ public class VentaServiceImpl implements IVentaService {
     @Override
     public List<VentaDTO> obtenerVentas() {
         List<VentaModel> listaVentas = (List<VentaModel>) ventaRepository.findAll();
-        listaVentas.sort(Comparator.comparing(item -> item.getFechaEntrega()));
+        listaVentas.sort(Comparator.comparing(venta -> venta.getFechaEntrega(), Comparator.reverseOrder()));
+        //listaVentas.sort(Comparator.comparing(item -> item.getFechaEntrega()));
 
         return listaVentas.stream()
             .map(item -> modelMapper.map(item, VentaDTO.class))
@@ -93,9 +97,56 @@ public class VentaServiceImpl implements IVentaService {
         return modelMapper.map(ventaModel, VentaDTO.class);
     }
 
+    @Autowired
+    private IArticuloVentaService articuloVentaService;
+
+    @Autowired
+    private IEjemplarVentaService ejemplarVentaService;
+
+    @Autowired
+    private IEjemplarService ejemplarService;
+
     @Override
-    public boolean eliminarVenta(Long id) {
-        return false;
+    public boolean eliminarVenta(VentaDTO ventaDTO) {
+        List<ArticuloVentaDTO> articulosVenta = new ArrayList<>();
+        List<EjemplarVentaDTO> ejemplaresVenta = new ArrayList<>();
+
+        // Obtener articulos venta y ejemplares venta (si existen)
+        if(ventaDTO.getArticulosVenta() != null && !ventaDTO.getArticulosVenta().isEmpty()){
+            articulosVenta = ventaDTO.getArticulosVenta();
+        }
+        if(ventaDTO.getEjemplaresVenta() != null && !ventaDTO.getEjemplaresVenta().isEmpty()){
+            ejemplaresVenta = ventaDTO.getEjemplaresVenta();
+        }
+
+        try {
+            // Eliminar articulos venta (si existen)
+            if(articulosVenta != null && !articulosVenta.isEmpty()){
+                articulosVenta.forEach(articuloVenta -> articuloVentaService.eliminarArticuloVentaPorId(articuloVenta.getId()));
+            }
+            
+            // Eliminar ejemplares venta (si existen)
+            if(ejemplaresVenta != null && !ejemplaresVenta.isEmpty()){
+                for(EjemplarVentaDTO ejemplarVenta : ejemplaresVenta){
+                    // Liberar ejemplar
+                    EjemplarDTO ejemplarDTO = ejemplarVenta.getEjemplar();
+                    ejemplarDTO.setVendido(false);
+                    ejemplarService.editarEjemplar(ejemplarDTO);
+
+                    // Eliminar ejemplar venta
+                    ejemplarVentaService.eliminarEjemplarVentaPorId(ejemplarVenta.getId());
+                }
+            }
+
+            // Eliminar venta
+            ventaRepository.deleteById(ventaDTO.getId());
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
     }
 
 /* 

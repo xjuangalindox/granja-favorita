@@ -14,10 +14,13 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
 import com.example.demo.controllers.dto.ArticuloVentaDTO;
+import com.example.demo.controllers.dto.EjemplarDTO;
 import com.example.demo.controllers.dto.EjemplarVentaDTO;
+import com.example.demo.controllers.dto.NacimientoDTO;
 import com.example.demo.controllers.dto.VentaDTO;
 import com.example.demo.services.IArticuloService;
 import com.example.demo.services.IArticuloVentaService;
+import com.example.demo.services.IEjemplarService;
 import com.example.demo.services.IEjemplarVentaService;
 import com.example.demo.services.INacimientoService;
 import com.example.demo.services.IVentaService;
@@ -62,13 +65,28 @@ public class VentaController {
     /// INSERT
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    private List<NacimientoDTO> filtrarEjemplaresDisponibles(List<NacimientoDTO> listaNacimientos){
+        if(listaNacimientos != null && !listaNacimientos.isEmpty()){
+
+            for(NacimientoDTO nac : listaNacimientos){
+                List<EjemplarDTO> ejemplaresDisponibles = nac.getEjemplares().stream()
+                    .filter(eje -> !eje.isVendido())
+                    .collect(Collectors.toList());
+
+                nac.setEjemplares(ejemplaresDisponibles);
+            }
+        }
+        
+        return listaNacimientos;
+    }
+
     @GetMapping("/ventas/crear")
     public String formularioCrear(Model model) {
         model.addAttribute("ventaDTO", new VentaDTO());
         model.addAttribute("titulo", "Registrar Venta");
         model.addAttribute("accion", "/ventas/guardar");
         model.addAttribute("listaArticulos", articuloService.obtenerArticulos());
-        model.addAttribute("listaNacimientos", nacimientoService.obtenerNacimientos());
+        model.addAttribute("listaNacimientos", filtrarEjemplaresDisponibles(nacimientoService.obtenerNacimientos()));
 
         return "ventas/formulario";
     }
@@ -106,7 +124,7 @@ public class VentaController {
             model.addAttribute("titulo", "Registrar Venta");
             model.addAttribute("accion", "/ventas/guardar");
             model.addAttribute("listaArticulos", articuloService.obtenerArticulos());
-            model.addAttribute("listaNacimientos", nacimientoService.obtenerNacimientos());
+            model.addAttribute("listaNacimientos", filtrarEjemplaresDisponibles(nacimientoService.obtenerNacimientos()));
 
             model.addAttribute("mensaje", "Ocurrió un error al registrar la venta.");
             return "ventas/formulario";
@@ -115,11 +133,22 @@ public class VentaController {
         // 3. Mostrar venta registrada
         redirectAttributes.addFlashAttribute("ok", "Venta registrada correctamente.");
         return "redirect:/ventas";
-    }
+    } 
     
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// UPDATE
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // Obtener idNacimiento de cada EjemplarVenta (sin duplicados)
+    private Set<Long> getIdsNacimientosUnicos(List<EjemplarVentaDTO> ejemplaresVenta){
+        Set<Long> idsNacimientosUnicos = new HashSet<>();
+
+        if(ejemplaresVenta != null && !ejemplaresVenta.isEmpty()){
+            ejemplaresVenta.forEach(eje -> idsNacimientosUnicos.add(eje.getEjemplar().getNacimiento().getId()));
+        }
+        
+        return idsNacimientosUnicos;
+    }
 
     @GetMapping("/ventas/editar/{id}")
     public String formularioEditar(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
@@ -131,50 +160,58 @@ public class VentaController {
         }
 
         VentaDTO ventaDTO = ventaOpt.get();
-        Set<Long> idNacimientos = new HashSet<>();
-
-        // Obtener idNacimiento de cada EjemplarVenta (sin duplicados)
-        if(ventaDTO.getEjemplaresVenta() != null && !ventaDTO.getEjemplaresVenta().isEmpty()){
-            for(EjemplarVentaDTO eje : ventaDTO.getEjemplaresVenta()){
-                idNacimientos.add(eje.getEjemplar().getNacimiento().getId());
-            }
-        }
-
         model.addAttribute("ventaDTO", ventaDTO);
         model.addAttribute("titulo", "Editar Venta");
         model.addAttribute("accion", "/ventas/editar/"+id);
         model.addAttribute("listaArticulos", articuloService.obtenerArticulos());
-        model.addAttribute("listaNacimientos", nacimientoService.obtenerNacimientos());
-        model.addAttribute("idNacimientos", idNacimientos);
+        model.addAttribute("listaNacimientos", filtrarEjemplaresDisponibles(nacimientoService.obtenerNacimientos()));
+        model.addAttribute("idsNacimientosUnicos", getIdsNacimientosUnicos(ventaDTO.getEjemplaresVenta()));
 
         return "ventas/formulario";
     }
 
+    @Autowired
+    private IEjemplarService ejemplarService;
+
     @PostMapping("/ventas/editar/{id}")
     public String editarVenta(@PathVariable("id") Long id, @ModelAttribute("ventaDTO") VentaDTO ventaDTO,
-        @RequestParam(name = "articulosVentaEliminados", required = false) List<Long> articulosVentaEliminados,
-        @RequestParam(name = "ejemplaresVentaEliminados", required = false) List<Long> ejemplaresVentaEliminados,
+        @RequestParam(name = "nacimientosEliminados", required = false) List<Long> nacimientosEliminados,
+        @RequestParam(name = "articulosEliminados", required = false) List<Long> articulosEliminados,
         Model model, RedirectAttributes redirectAttributes) {
 
-        System.out.println("\n\n\n");
-        System.out.println("\n\n\n");
-        System.out.println(ventaDTO.toString());
-        System.out.println("\n\n\n");
-        System.out.println("\n\n\n");
-
-        // Acceso desde la barra de direcciones
-        /*Optional<VentaDTO> ventaOpt = ventaService.obtenerVentaPorId(id);
+        Optional<VentaDTO> ventaOpt = ventaService.obtenerVentaPorId(id);
         if(ventaOpt.isEmpty()){
-            redirectAttributes.addFlashAttribute("error", "Venta no encontrada.");
+            redirectAttributes.addFlashAttribute("error", "Venta no encontrada");
             return "redirect:/ventas";
         }
 
-        // 1. Eliminar articulos y ejemplares eliminados en el formulario
-        if(articulosVentaEliminados != null && !articulosVentaEliminados.isEmpty()){
-            articulosVentaEliminados.forEach(item -> articuloVentaService.eliminarArticuloVentaPorId(item));
+        VentaDTO ventaOriginal = ventaOpt.get();
+
+        // 1. Liberar ejemplares y eliminar ejemplares venta eliminados en el formulario
+        if(idsNacimientosEliminados != null && !idsNacimientosEliminados.isEmpty()){
+            for(EjemplarVentaDTO ejeV : ventaOriginal.getEjemplaresVenta()){
+                if(idsNacimientosEliminados.contains(ejeV.getEjemplar().getNacimiento().getId())){
+                    // Liberar ejemplar y eliminar ejemplar venta
+                    ejeV.getEjemplar().setVendido(false);
+                    // Eliminar ejemplar venta
+                    //ejeV.setPrecio(null);
+                    //ejeV.setEjemplar(null);
+                    //ejeV.setVenta(null);
+
+                    try {
+                        ejemplarService.editarEjemplar(ejeV.getEjemplar());
+                        ejemplarVentaService.eliminarEjemplarVentaPorId(ejeV.getId());
+
+                    } catch (Exception e) {
+                        model.addAttribute("error", "Ocrruió un error al eliminar el ejemplar venta");
+                    }
+                }
+            }
         }
-        if(ejemplaresVentaEliminados != null && !ejemplaresVentaEliminados.isEmpty()){
-            ejemplaresVentaEliminados.forEach(item -> ejemplarVentaService.eliminarEjemplarVentaPorId(item));
+
+        // 2. Eliminar articulos y ejemplares eliminados en el formulario
+        if(articulosEliminados != null && !articulosEliminados.isEmpty()){
+            articulosEliminados.forEach(idArtV -> articuloVentaService.eliminarArticuloVentaPorId(idArtV));
         }
 
         // Listas para articulosVenta y ejemplaresVenta filtrados (nuevos y existentes)
@@ -214,7 +251,35 @@ public class VentaController {
                 articulosExistentes.forEach(articuloVenta -> articuloVentaService.editarArticuloVenta(articuloVenta.getId(), articuloVenta));
             }
             if(ejemplaresExistentes != null && !ejemplaresExistentes.isEmpty()){
-                ejemplaresExistentes.forEach(ejemplarVenta -> ejemplarVentaService.editarEjemplarVenta(ejemplarVenta.getId(), ejemplarVenta));
+                for(EjemplarVentaDTO ejeV : ejemplaresExistentes){
+                    if(ejeV.getEjemplar().isVendido() == true){
+                        // Actualizar ejemplar venta
+                        ejemplarVentaService.editarEjemplarVenta(ejeV.getId(), ejeV);
+
+                    }else{
+                        // liberar ejemplar y eliminar ejemplar venta
+                        ejeV.getEjemplar().setVendido(false);
+                        //ejeV.setPrecio(null);
+                        //ejeV.setEjemplar(null);
+                        //ejeV.setVenta(null);
+
+                        try {
+                            ejemplarService.editarEjemplar(ejeV.getEjemplar());
+                            //ejemplarVentaService.editarEjemplarVenta(ejeV.getId(), ejeV);
+                            ejemplarVentaService.eliminarEjemplarVentaPorId(ejeV.getId());
+
+                        } catch (Exception e) {
+                            model.addAttribute("ventaDTO", ventaDTO);
+                            model.addAttribute("titulo", "Editar Venta");
+                            model.addAttribute("accion", "/ventas/editar/"+id);
+                            model.addAttribute("listaArticulos", articuloService.obtenerArticulos());
+                            model.addAttribute("listaNacimientos", nacimientoService.obtenerNacimientos());
+
+                            model.addAttribute("mensaje", "Ocurrio un error al editar la venta.");
+                            return "ventas/formulario";
+                        }
+                    }
+                }
             }
 
         } catch (Exception e) {
@@ -226,7 +291,7 @@ public class VentaController {
 
             model.addAttribute("mensaje", "Ocurrio un error al editar la venta.");
             return "ventas/formulario";
-        }*/
+        }
 
         redirectAttributes.addFlashAttribute("ok", "Venta modificada correctamente.");
         return "redirect:/ventas";
@@ -238,9 +303,21 @@ public class VentaController {
     
     @GetMapping("/ventas/eliminar/{id}")
     public String eliminarVenta(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
-        ventaService.eliminarVenta(id);
+        Optional<VentaDTO> ventaOpt = ventaService.obtenerVentaPorId(id);
+        if(ventaOpt.isEmpty()){
+            redirectAttributes.addFlashAttribute("error", "Venta no encontrada.");
+            return "redirect:/ventas";
+        }
 
-        redirectAttributes.addFlashAttribute("mensaje", "Venta eliminada correctamente");
+        try {
+            ventaService.eliminarVenta(ventaOpt.get());
+            redirectAttributes.addFlashAttribute("ok", "Venta eliminada correctamente.");
+            
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Ocurrió un error al eliminar la venta.");
+            return "redirect:/ventas";
+        }
+
         return "redirect:/ventas";
     }
 
@@ -290,13 +367,14 @@ public class VentaController {
                 ejeVenta.getPrecio() != null &&
                 ejeVenta.getEjemplar() != null &&
                 ejeVenta.getEjemplar().getId() != null &&
-                ejeVenta.getEjemplar().isVendido() == true)
+                ejeVenta.getEjemplar().isVendido())
             .collect(Collectors.toList());
     }
 
     private List<EjemplarVentaDTO> filtrarEjemplaresExistentes(List<EjemplarVentaDTO> ejemplaresVenta) {
         return ejemplaresVenta.stream()
-            .filter(item -> item.getId() != null &&
+            .filter(item -> 
+                item.getId() != null &&
                 item.getPrecio() != null &&
                 item.getEjemplar() != null &&
                 item.getEjemplar().getId() != null)

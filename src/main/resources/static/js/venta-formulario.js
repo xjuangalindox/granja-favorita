@@ -3,12 +3,18 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 window.addEventListener('DOMContentLoaded', () => {    
-    if(articulosVenta.length > 0){
-        articulosVenta.forEach(art => agregarArticuloExistente(art));
+    if(articulosVenta != null){
+        if(articulosVenta.length > 0){
+            articulosVenta.forEach(art => agregarArticuloExistente(art));
+        }
     }
-    if(idNacimientos.length > 0){
-        agregarNacimientosExistentes();
+
+    if(idNacimientos != null){
+        if(idNacimientos.length > 0){
+            agregarNacimientosExistentes();
+        }
     }
+    
     //if(ejemplaresVenta.length > 0){
     //    ejemplaresVenta.forEach(eje => agregarNacimientosExistentes(eje));
     //}
@@ -22,28 +28,28 @@ let contArticulo = 0; // contador para cada ArticuloVenta
 let contNacimiento = 0; // solo para que cada nacimiento sea único al eliminarlo
 let contEjemplar = 0; // contador para cada EjemplarVenta
 
-const listaIdsArticulosSeleccionados = [];
-const listaIdsNacimientosSeleccionados = [];
+const articulosSeleccionados = [];
+const nacimientosSeleccionados = [];
 
 let articulosEliminados = [];
-let ejemplaresEliminados = [];
+let nacimientosEliminados = [];
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //CREACION Y MODIFICACION DE ARTICULOS
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function guardarIdArticuloSeleccionado(articuloId) {
+function guardarArticulo(articuloId) {
     articuloId = parseInt(articuloId);
-    if (!listaIdsArticulosSeleccionados.includes(articuloId)) {
-        listaIdsArticulosSeleccionados.push(articuloId);
-        console.log("Artículos seleccionados:", listaIdsArticulosSeleccionados);
+    if (!articulosSeleccionados.includes(articuloId)) {
+        articulosSeleccionados.push(articuloId);
+        console.log("Artículo agregado:", articuloId);
     }
 }
 
 function liberarArticulo(articuloId) {
-    const index = listaIdsArticulosSeleccionados.indexOf(articuloId);
+    const index = articulosSeleccionados.indexOf(articuloId);
     if (index !== -1) { // ¿Encontrado?
-        listaIdsArticulosSeleccionados.splice(index, 1);
+        articulosSeleccionados.splice(index, 1);
         console.log("Artículo eliminado:", articuloId);
     }
 }
@@ -76,10 +82,10 @@ function agregarArticulo() {
     // Generamos las opciones del select en JS
     let opciones = '<option value="">Selecciona un artículo</option>';
 
-    listaArticulos.forEach(item => {
-        if (!listaIdsArticulosSeleccionados.includes(item.id)) {
-            opciones += `<option value="${item.id}" data-precio="${item.precio}">
-                            ${item.presentacion} ${item.nombre}  ($${item.precio})
+    listaArticulos.forEach(art => {
+        if (!articulosSeleccionados.includes(art.id)) {
+            opciones += `<option value="${art.id}" data-precio="${art.precio}">
+                            ${art.presentacion} ${art.nombre}  ($${art.precio})
                         </option>`;
         }
     });
@@ -88,7 +94,7 @@ function agregarArticulo() {
     row.innerHTML = `
         <td>
             <select name="articulosVenta[${contArticulo}].articulo.id" class="form-select" required
-                onchange="guardarIdArticuloSeleccionado(this.value)">
+                onchange="guardarArticulo(this.value)">
                 ${opciones}
             </select>
         </td>
@@ -121,7 +127,7 @@ function agregarArticuloExistente(art) {
     let opciones = '<option value="">Selecciona un artículo</option>';
 
     listaArticulos.forEach(item => {
-        if (!listaIdsArticulosSeleccionados.includes(item.id)) {
+        if (!articulosSeleccionados.includes(item.id)) {
             const selected = item.id === art.articulo.id ? 'selected' : '';
             opciones += `<option value="${item.id}" data-precio="${item.precio}" ${selected}>
                             ${item.presentacion} ${item.nombre}  ($${item.precio})
@@ -136,7 +142,7 @@ function agregarArticuloExistente(art) {
 
         <td>
             <select name="articulosVenta[${contArticulo}].articulo.id" class="form-select" required
-                onchange="guardarIdArticuloSeleccionado(this.value)">
+                onchange="guardarArticulo(this.value)">
                 ${opciones}
             </select>
         </td>
@@ -159,10 +165,10 @@ function agregarArticuloExistente(art) {
     tbody.appendChild(row);
     contArticulo++;
 
-    // Obtener el valor del select y guardarlo para no repetirlo
+    // guardar manualmente los ids de articulos selecionados
     const select = row.querySelector('select');
     if (select.value) {
-        guardarIdArticuloSeleccionado(select.value);
+        guardarArticulo(select.value);
     }
 }
 
@@ -170,18 +176,18 @@ function agregarArticuloExistente(art) {
 //CREACION Y MODIFICACION DE EJEMPLARES
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function guardarIdNacimientoSeleccionado(nacimientoId) {
+function guardarNacimiento(nacimientoId) {
     nacimientoId = parseInt(nacimientoId);
-    if (!listaIdsNacimientosSeleccionados.includes(nacimientoId)) {
-        listaIdsNacimientosSeleccionados.push(nacimientoId);
-        console.log("Nacimientos seleccionados:", listaIdsNacimientosSeleccionados);
+    if(!nacimientosSeleccionados.includes(nacimientoId)){
+        nacimientosSeleccionados.push(nacimientoId);
+        console.log("Nacimiento agregado: ", nacimientoId);
     }
 }
 
 function liberarNacimiento(nacimientoId) {
-    const index = listaIdsNacimientosSeleccionados.indexOf(nacimientoId);
+    const index = nacimientosSeleccionados.indexOf(nacimientoId);
     if (index !== -1) { // ¿Encontrado?
-        listaIdsNacimientosSeleccionados.splice(index, 1);
+        nacimientosSeleccionados.splice(index, 1);
         console.log("Nacimiento eliminado:", nacimientoId);
     }
 }
@@ -194,16 +200,21 @@ function eliminarNacimiento(boton){
     if(nacimientoId){
         liberarNacimiento(nacimientoId);
     }
-
-    // Buscar dentro del row un input oculto cuyo name termina en .id
-    /*const inputId = row.querySelector('input[type="hidden"][name$=".id"]');
-    if(inputId && inputId.value){ // Si encontró el input y tiene valor
-        articulosEliminados.push(parseInt(inputId.value));
-        console.log("ArticuloVenta eliminado: "+inputId.value)
-    }*/
-
+    
     bloque.remove();
     actualizarTotalVenta();
+}
+
+function agregarNacimientoEliminado(boton){
+    const bloque = boton.closest('div.mb-4');
+
+    const select = bloque.querySelector('select');
+    const nacimientoId = parseInt(select.value);
+    
+    if(nacimientoId){
+        nacimientosEliminados.push(nacimientoId);
+        console.log("Nacimiento existente eliminado: ",nacimientoId);
+    }
 }
 
 function onCheckboxChange(checkbox) {
@@ -231,7 +242,7 @@ function agregarNacimiento() {
     let opciones = '<option value="">Selecciona un nacimiento</option>';
 
     listaNacimientos.forEach(nac => {
-        if (!listaIdsNacimientosSeleccionados.includes(nac.id)) {
+        if (!nacimientosSeleccionados.includes(nac.id)) {
             opciones += `<option value="${nac.id}">
                             ${nac.monta.macho.nombre} - ${nac.monta.hembra.nombre} (${nac.fechaNacimiento})
                         </option>`;
@@ -245,7 +256,8 @@ function agregarNacimiento() {
     bloque.innerHTML = `
         <div class="d-flex justify-content-between align-items-start mb-2">
             <select class="form-select" required
-                onchange="guardarIdNacimientoSeleccionado(this.value); mostrarEjemplares(this.value, ${nacimientoIndex})">
+                onchange="guardarNacimiento(this.value); 
+                mostrarEjemplares(this.value, ${nacimientoIndex})">
                 ${opciones}
             </select>
 
@@ -283,9 +295,7 @@ function mostrarEjemplares(nacimientoId, nacimientoIndex) {
                 <input class="form-check-input mb-2" 
                     type="checkbox" 
                     name="ejemplaresVenta[${contEjemplar}].ejemplar.vendido" 
-                    value="true"
-                    onchange="onCheckboxChange(this)"
-                    ${ejemplar.vendido ? 'checked' : ''}>
+                    onchange="onCheckboxChange(this)">
 
                 <a href="/img/ejemplares/${ejemplar.nombreImagen}"  target="_blank">
                     <img src="/img/ejemplares/${ejemplar.nombreImagen}"  
@@ -301,8 +311,7 @@ function mostrarEjemplares(nacimientoId, nacimientoIndex) {
                         type="number" 
                         name="ejemplaresVenta[${contEjemplar}].precio"
                         min="0"
-                        ${!ejemplar.vendido ? 'readonly' : ''}
-                        ${ejemplar.vendido ? 'required' : ''}
+                        readonly
                         oninput="actualizarTotalVenta()">
                 </div>
             </div>
@@ -325,8 +334,8 @@ function agregarNacimientosExistentes() {
 
     listaNacimientos.forEach(nac => {
         let selected = '';
-        if (!listaIdsNacimientosSeleccionados.includes(nac.id)) {
-            if(idNacimientos.includes(nac.id)){
+        if (!nacimientosSeleccionados.includes(nac.id)) {
+            if(idsNacimientosUnicos.includes(nac.id)){
                 selected = 'selected';
             }
             
@@ -343,11 +352,12 @@ function agregarNacimientosExistentes() {
     bloque.innerHTML = `
         <div class="d-flex justify-content-between align-items-start mb-2">
             <select class="form-select" required 
-                onchange="guardarIdNacimientoSeleccionado(this.value); mostrarEjemplaresExistentes(this.value, ${nacimientoIndex})">
+                onchange="guardarNacimiento(this.value); mostrarEjemplaresExistentes(this.value, ${nacimientoIndex})">
                 ${opciones}
             </select>
 
-            <button type="button" class="btn btn-danger btn-sm mx-2" onclick="eliminarNacimiento(this)">
+            <button type="button" class="btn btn-danger btn-sm mx-2" 
+                onclick="eliminarNacimiento(this); agregarNacimientoEliminado(this)">
                 <i class="bi bi-x-lg"></i>
             </button>
         </div>
@@ -362,7 +372,7 @@ function agregarNacimientosExistentes() {
     // Obtener el valor del select, guardarlo para no repetirlo
     const select = bloque.querySelector('select');
     if (select.value) {
-        guardarIdNacimientoSeleccionado(select.value);
+        nacimientosSeleccionados(select.value);
         mostrarEjemplaresExistentes(select.value, nacimientoIndex);
     }
 }
@@ -499,10 +509,10 @@ document.getElementById("formVenta").addEventListener("submit", function () {
         this.appendChild(input);
     });
 
-    ejemplaresEliminados.forEach(id => {
+    nacimientosEliminados.forEach(id => {
         const input = document.createElement("input");
         input.type = "hidden";
-        input.name = "ejemplaresEliminados";
+        input.name = "nacimientosEliminados";
         input.value = id;
         this.appendChild(input);
     });

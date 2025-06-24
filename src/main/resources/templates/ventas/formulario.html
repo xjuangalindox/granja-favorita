@@ -44,7 +44,7 @@
 
                             <div class="mb-3">
                                 <label class="form-label">Fecha Entrega</label>
-                                <input class="form-control" type="datetime-local" th:field="*{fechaEntrega}" >
+                                <input class="form-control" type="datetime-local" th:field="*{fechaEntrega}" required>
                             </div>
 
                             <div class="mb-3">
@@ -127,7 +127,7 @@
     <script th:inline="javascript">
         let listaArticulos = /*[[${listaArticulos}]]*/ [];
         let listaNacimientos = /*[[${listaNacimientos}]]*/ [];
-        let idNacimientos = /*[[${idNacimientos}]]*/ [];
+        let idsNacimientosUnicos = /*[[${idsNacimientosUnicos}]]*/ [];
 
         let articulosVenta = /*[[${ventaDTO.articulosVenta}]]*/ [];
         let ejemplaresVenta = /*[[${ventaDTO.ejemplaresVenta}]]*/ [];

@@ -65,13 +65,15 @@ public class ArticuloVentaServiceImpl implements IArticuloVentaService{
             throw new RuntimeException("Articulo no encontrado");
         }
 
-        ArticuloVentaDTO articuloVenta = new ArticuloVentaDTO();
+        // Asigar articulo a articulo venta y persistir
+        articuloVentaDTO.setArticulo(articuloOpt.get());
+        /*ArticuloVentaDTO articuloVenta = new ArticuloVentaDTO();
         articuloVenta.setCantidad(articuloVentaDTO.getCantidad());
         articuloVenta.setSubtotal(articuloVentaDTO.getSubtotal());
         articuloVenta.setArticulo(articuloOpt.get());
-        articuloVenta.setVenta(articuloVentaDTO.getVenta());
+        articuloVenta.setVenta(articuloVentaDTO.getVenta());*/
 
-        ArticuloVentaModel articuloVentaModel = modelMapper.map(articuloVenta, ArticuloVentaModel.class);
+        ArticuloVentaModel articuloVentaModel = modelMapper.map(articuloVentaDTO, ArticuloVentaModel.class);
         articuloVentaModel = articuloVentaRepository.save(articuloVentaModel);
         
         return modelMapper.map(articuloVentaModel, ArticuloVentaDTO.class);

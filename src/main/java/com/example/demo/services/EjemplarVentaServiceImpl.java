@@ -26,17 +26,24 @@ public class EjemplarVentaServiceImpl implements IEjemplarVentaService{
     @Override
     public EjemplarVentaDTO guardarEjemplarVenta(EjemplarVentaDTO ejemplarVentaDTO) {
 
+        // Marcar ejemplar como vendido
         Optional<EjemplarDTO> ejemplarOpt = ejemplarService.obtenerEjemplarPorId(ejemplarVentaDTO.getEjemplar().getId());
         if(ejemplarOpt.isEmpty()){
             throw new RuntimeException("Ejemplar no encontrado");
         }
 
-        EjemplarVentaDTO ejemplarVenta = new EjemplarVentaDTO();
+        EjemplarDTO ejemplarDTO = ejemplarOpt.get();
+        ejemplarDTO.setVendido(true);
+        ejemplarDTO = ejemplarService.guardarEjemplar(ejemplarDTO);
+
+        // Asigar ejemplar a ejemplar venta y persistir
+        ejemplarVentaDTO.setEjemplar(ejemplarDTO);
+        /*EjemplarVentaDTO ejemplarVenta = new EjemplarVentaDTO();
         ejemplarVenta.setPrecio(ejemplarVentaDTO.getPrecio());
         ejemplarVenta.setEjemplar(ejemplarOpt.get());
-        ejemplarVenta.setVenta(ejemplarVentaDTO.getVenta());
+        ejemplarVenta.setVenta(ejemplarVentaDTO.getVenta());*/
 
-        EjemplarVentaModel ejemplarVentaModel = modelMapper.map(ejemplarVenta, EjemplarVentaModel.class);
+        EjemplarVentaModel ejemplarVentaModel = modelMapper.map(ejemplarVentaDTO, EjemplarVentaModel.class);
         ejemplarVentaModel = ejemplarVentaRepository.save(ejemplarVentaModel);
 
         return modelMapper.map(ejemplarVentaModel, EjemplarVentaDTO.class);
