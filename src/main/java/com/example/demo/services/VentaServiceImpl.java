@@ -1,9 +1,5 @@
 package com.example.demo.services;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -18,12 +14,8 @@ import com.example.demo.controllers.dto.ArticuloVentaDTO;
 import com.example.demo.controllers.dto.EjemplarDTO;
 import com.example.demo.controllers.dto.EjemplarVentaDTO;
 import com.example.demo.controllers.dto.VentaDTO;
-import com.example.demo.models.ArticuloVentaModel;
-import com.example.demo.models.EjemplarModel;
 import com.example.demo.models.VentaModel;
 import com.example.demo.repositories.VentaRepository;
-
-import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class VentaServiceImpl implements IVentaService {
@@ -34,11 +26,20 @@ public class VentaServiceImpl implements IVentaService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private IArticuloVentaService articuloVentaService;
+
+    @Autowired
+    private IEjemplarVentaService ejemplarVentaService;
+
+    @Autowired
+    private IEjemplarService ejemplarService;
+
     @Override
     public List<VentaDTO> obtenerVentas() {
         List<VentaModel> listaVentas = (List<VentaModel>) ventaRepository.findAll();
-        listaVentas.sort(Comparator.comparing(venta -> venta.getFechaEntrega(), Comparator.reverseOrder()));
-        //listaVentas.sort(Comparator.comparing(item -> item.getFechaEntrega()));
+        listaVentas.sort(Comparator.comparing(VentaModel::getFechaEntrega).reversed());
+        //listaVentas.sort(Comparator.comparing(venta -> venta.getFechaEntrega(), Comparator.reverseOrder()));
 
         return listaVentas.stream()
             .map(item -> modelMapper.map(item, VentaDTO.class))
@@ -96,15 +97,6 @@ public class VentaServiceImpl implements IVentaService {
 
         return modelMapper.map(ventaModel, VentaDTO.class);
     }
-
-    @Autowired
-    private IArticuloVentaService articuloVentaService;
-
-    @Autowired
-    private IEjemplarVentaService ejemplarVentaService;
-
-    @Autowired
-    private IEjemplarService ejemplarService;
 
     @Override
     public boolean eliminarVenta(VentaDTO ventaDTO) {

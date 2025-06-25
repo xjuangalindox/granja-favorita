@@ -65,20 +65,7 @@ public class VentaController {
     /// INSERT
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private List<NacimientoDTO> filtrarEjemplaresDisponibles(List<NacimientoDTO> listaNacimientos){
-        if(listaNacimientos != null && !listaNacimientos.isEmpty()){
 
-            for(NacimientoDTO nac : listaNacimientos){
-                List<EjemplarDTO> ejemplaresDisponibles = nac.getEjemplares().stream()
-                    .filter(eje -> !eje.isVendido())
-                    .collect(Collectors.toList());
-
-                nac.setEjemplares(ejemplaresDisponibles);
-            }
-        }
-        
-        return listaNacimientos;
-    }
 
     @GetMapping("/ventas/crear")
     public String formularioCrear(Model model) {
@@ -93,7 +80,6 @@ public class VentaController {
 
     @PostMapping("/ventas/guardar")
     public String guardarVenta(@ModelAttribute("ventaDTO") VentaDTO ventaDTO, Model model, RedirectAttributes redirectAttributes) {
-        VentaDTO venta;
         List<ArticuloVentaDTO> articulosVenta = new ArrayList<>();
         List<EjemplarVentaDTO> ejemplaresVenta = new ArrayList<>();
 
@@ -106,17 +92,23 @@ public class VentaController {
         }
 
         // 2. Persistir por separado: venta, articulosVenta y ejemplaresVenta (nuevos)
+        VentaDTO venta;
+
         try {
             venta = ventaService.guardarVenta(ventaDTO);
 
             if(articulosVenta != null && !articulosVenta.isEmpty()){
-                articulosVenta.forEach(articuloVenta -> articuloVenta.setVenta(venta));
-                articulosVenta.forEach(articuloVenta -> articuloVentaService.guardarArticuloVenta(articuloVenta));
+                articulosVenta.forEach(articuloVenta -> {
+                    articuloVenta.setVenta(venta);
+                    articuloVentaService.guardarArticuloVenta(articuloVenta);
+                });
             }
 
             if(ejemplaresVenta != null && !ejemplaresVenta.isEmpty()){
-                ejemplaresVenta.forEach(ejemplarVenta -> ejemplarVenta.setVenta(venta));
-                ejemplaresVenta.forEach(ejemplarVenta -> ejemplarVentaService.guardarEjemplarVenta(ejemplarVenta));
+                ejemplaresVenta.forEach(ejemplarVenta -> {
+                    ejemplarVenta.setVenta(venta);
+                    ejemplarVentaService.guardarEjemplarVenta(ejemplarVenta);
+                });
             }
 
         } catch (Exception e) {
@@ -298,7 +290,7 @@ public class VentaController {
     }
     
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// DELETE
+    /// DELETE - READY
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     @GetMapping("/ventas/eliminar/{id}")
@@ -336,7 +328,7 @@ public class VentaController {
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// FILTROS (NUEVOS Y EXISTENTES)
+    /// FILTROS (NUEVOS Y EXISTENTES) Y EJEMPLARES DISPONIBLES (EN NACIMIENTO)
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private List<ArticuloVentaDTO> filtrarArticulosNuevos(List<ArticuloVentaDTO> articulosVenta){
@@ -379,5 +371,20 @@ public class VentaController {
                 item.getEjemplar() != null &&
                 item.getEjemplar().getId() != null)
             .collect(Collectors.toList());
+    }
+
+    private List<NacimientoDTO> filtrarEjemplaresDisponibles(List<NacimientoDTO> listaNacimientos){
+        if(listaNacimientos != null && !listaNacimientos.isEmpty()){
+
+            for(NacimientoDTO nac : listaNacimientos){
+                List<EjemplarDTO> ejemplaresDisponibles = nac.getEjemplares().stream()
+                    .filter(eje -> !eje.isVendido())
+                    .collect(Collectors.toList());
+
+                nac.setEjemplares(ejemplaresDisponibles);
+            }
+        }
+        
+        return listaNacimientos;
     }
 }

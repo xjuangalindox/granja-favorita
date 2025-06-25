@@ -57,15 +57,15 @@ public class EjemplarServiceImpl implements IEjemplarService{
         // Obtener EjemplarModel con ID
         EjemplarModel ejemplarModel = ejemplarRepository.findById(ejemplarDTO.getId())
             .orElseThrow(() -> new EntityNotFoundException("Ejemplar no encontrado"));
+        
+        // Obtener NacimientoModel de ejemplarDTO
+        NacimientoModel nacimientoModel = nacimientoRepository.findById(ejemplarDTO.getNacimiento().getId())
+            .orElseThrow(() -> new EntityNotFoundException("Nacimiento no encontrado"));
 
         // Setear informacion de EjemplarDTO a EjemplarModel
         ejemplarModel.setNombreImagen(ejemplarDTO.getNombreImagen());
         ejemplarModel.setSexo(ejemplarDTO.getSexo());
         ejemplarModel.setVendido(ejemplarDTO.isVendido());
-
-        // Asignar nuevo NacimientoModel a EjemplarModel
-        NacimientoModel nacimientoModel = nacimientoRepository.findById(ejemplarDTO.getNacimiento().getId())
-            .orElseThrow(() -> new EntityNotFoundException("Nacimiento no encontrado"));
         ejemplarModel.setNacimiento(nacimientoModel);
 
         // Persistir EjemplarModel con la nueva informacion

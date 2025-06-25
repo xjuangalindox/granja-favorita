@@ -24,17 +24,29 @@ public class EjemplarVentaServiceImpl implements IEjemplarVentaService{
     private IEjemplarService ejemplarService;
 
     @Override
+    public boolean eliminarEjemplarVentaPorId(Long id) {
+        if(ejemplarVentaRepository.existsById(id)){
+            ejemplarVentaRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public EjemplarVentaDTO guardarEjemplarVenta(EjemplarVentaDTO ejemplarVentaDTO) {
 
-        // Marcar ejemplar como vendido
+        // Obtener ejemplar del ejemplar venta
         Optional<EjemplarDTO> ejemplarOpt = ejemplarService.obtenerEjemplarPorId(ejemplarVentaDTO.getEjemplar().getId());
         if(ejemplarOpt.isEmpty()){
             throw new RuntimeException("Ejemplar no encontrado");
         }
 
+        // Persistir nuevo estatus del ejemplar
         EjemplarDTO ejemplarDTO = ejemplarOpt.get();
-        ejemplarDTO.setVendido(true);
-        ejemplarDTO = ejemplarService.guardarEjemplar(ejemplarDTO);
+        ejemplarDTO.setVendido(ejemplarVentaDTO.getEjemplar().isVendido());
+        ejemplarDTO = ejemplarService.editarEjemplar(ejemplarDTO);
+        //ejemplarDTO.setVendido(true);
+        //ejemplarDTO = ejemplarService.guardarEjemplar(ejemplarDTO);
 
         // Asigar ejemplar a ejemplar venta y persistir
         ejemplarVentaDTO.setEjemplar(ejemplarDTO);
@@ -47,15 +59,6 @@ public class EjemplarVentaServiceImpl implements IEjemplarVentaService{
         ejemplarVentaModel = ejemplarVentaRepository.save(ejemplarVentaModel);
 
         return modelMapper.map(ejemplarVentaModel, EjemplarVentaDTO.class);
-    }
-
-    @Override
-    public boolean eliminarEjemplarVentaPorId(Long id) {
-        if(ejemplarVentaRepository.existsById(id)){
-            ejemplarVentaRepository.deleteById(id);
-            return true;
-        }
-        return false;
     }
 
     @Override

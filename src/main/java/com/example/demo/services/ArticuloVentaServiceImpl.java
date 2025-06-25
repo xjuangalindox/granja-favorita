@@ -67,11 +67,6 @@ public class ArticuloVentaServiceImpl implements IArticuloVentaService{
 
         // Asigar articulo a articulo venta y persistir
         articuloVentaDTO.setArticulo(articuloOpt.get());
-        /*ArticuloVentaDTO articuloVenta = new ArticuloVentaDTO();
-        articuloVenta.setCantidad(articuloVentaDTO.getCantidad());
-        articuloVenta.setSubtotal(articuloVentaDTO.getSubtotal());
-        articuloVenta.setArticulo(articuloOpt.get());
-        articuloVenta.setVenta(articuloVentaDTO.getVenta());*/
 
         ArticuloVentaModel articuloVentaModel = modelMapper.map(articuloVentaDTO, ArticuloVentaModel.class);
         articuloVentaModel = articuloVentaRepository.save(articuloVentaModel);
