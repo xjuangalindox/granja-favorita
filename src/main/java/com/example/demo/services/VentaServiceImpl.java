@@ -91,6 +91,9 @@ public class VentaServiceImpl implements IVentaService {
         venta.setTotalVenta(ventaDTO.getTotalVenta());
         venta.setNota(ventaDTO.getNota());
         venta.setEstatus(ventaDTO.getEstatus());
+        // Limpiar listas (se deben persitir manualmente)
+        venta.setArticulosVenta(null);
+        venta.setEjemplaresVenta(null);
 
         VentaModel ventaModel = modelMapper.map(venta, VentaModel.class);
         ventaModel = ventaRepository.save(ventaModel);

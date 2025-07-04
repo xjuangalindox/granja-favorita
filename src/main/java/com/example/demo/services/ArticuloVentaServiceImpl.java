@@ -35,21 +35,23 @@ public class ArticuloVentaServiceImpl implements IArticuloVentaService{
     @Override
     public ArticuloVentaDTO editarArticuloVenta(Long id, ArticuloVentaDTO articuloVentaDTO) {
 
+        // Obtener el articulo venta original
         Optional<ArticuloVentaDTO> articuloVentaOpt = obtenerArticuloVentaPorId(id);
         if(articuloVentaOpt.isEmpty()){
             throw new RuntimeException("ArticuloVenta no encontrado.");
         }
 
+        // Obtener el articulo asignado en el formulario
         Optional<ArticuloDTO> articuloOpt = articuloService.obtenerPorId(articuloVentaDTO.getArticulo().getId());
         if(articuloOpt.isEmpty()){
             throw new RuntimeException("Articulo no encontrado.");
         }
 
+        // Setear nueva informacion y persistir
         ArticuloVentaDTO articuloVenta = articuloVentaOpt.get();
         articuloVenta.setCantidad(articuloVentaDTO.getCantidad());
         articuloVenta.setSubtotal(articuloVentaDTO.getSubtotal());
         articuloVenta.setArticulo(articuloOpt.get());
-        //articuloVenta.setVenta(articuloVentaDTO.getVenta());
 
         ArticuloVentaModel articuloVentaModel = modelMapper.map(articuloVenta, ArticuloVentaModel.class);
         articuloVentaModel = articuloVentaRepository.save(articuloVentaModel);

@@ -15,6 +15,11 @@
         <div class="card shadow-lg">
             <div class="card-header bg-primary text-white text-center">
                 <h2 class="text-center mb-4" th:text="${titulo}">Titulo</h2>
+
+                <!-- Mensaje Danger -->
+                <div th:if="${mensaje}" class="alert alert-danger text-center" role="alert">
+                    <span th:text="${mensaje}"></span>
+                </div>
             </div>
 
             <div class="card-body">
@@ -127,10 +132,11 @@
     <script th:inline="javascript">
         let listaArticulos = /*[[${listaArticulos}]]*/ [];
         let listaNacimientos = /*[[${listaNacimientos}]]*/ [];
-        let idsNacimientosUnicos = /*[[${idsNacimientosUnicos}]]*/ [];
 
         let articulosVenta = /*[[${ventaDTO.articulosVenta}]]*/ [];
         let ejemplaresVenta = /*[[${ventaDTO.ejemplaresVenta}]]*/ [];
+
+        let idsNacimientosUtilizados = /*[[${idsNacimientosUtilizados}]]*/ [];
     </script>
 
     <!-- luego cargamos el archivo que la usa -->

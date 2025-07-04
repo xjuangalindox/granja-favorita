@@ -45,15 +45,9 @@ public class EjemplarVentaServiceImpl implements IEjemplarVentaService{
         EjemplarDTO ejemplarDTO = ejemplarOpt.get();
         ejemplarDTO.setVendido(ejemplarVentaDTO.getEjemplar().isVendido());
         ejemplarDTO = ejemplarService.editarEjemplar(ejemplarDTO);
-        //ejemplarDTO.setVendido(true);
-        //ejemplarDTO = ejemplarService.guardarEjemplar(ejemplarDTO);
 
         // Asigar ejemplar a ejemplar venta y persistir
         ejemplarVentaDTO.setEjemplar(ejemplarDTO);
-        /*EjemplarVentaDTO ejemplarVenta = new EjemplarVentaDTO();
-        ejemplarVenta.setPrecio(ejemplarVentaDTO.getPrecio());
-        ejemplarVenta.setEjemplar(ejemplarOpt.get());
-        ejemplarVenta.setVenta(ejemplarVentaDTO.getVenta());*/
 
         EjemplarVentaModel ejemplarVentaModel = modelMapper.map(ejemplarVentaDTO, EjemplarVentaModel.class);
         ejemplarVentaModel = ejemplarVentaRepository.save(ejemplarVentaModel);
@@ -64,11 +58,13 @@ public class EjemplarVentaServiceImpl implements IEjemplarVentaService{
     @Override
     public EjemplarVentaDTO editarEjemplarVenta(Long id, EjemplarVentaDTO ejemplarVentaDTO) {
 
+        // Obtener ejemplar venta original
         Optional<EjemplarVentaDTO> ejemplarVentaOpt = obtenerEjemplarVentaPorId(id);
         if(ejemplarVentaOpt.isEmpty()){
             throw new RuntimeException("EjemplarVenta no encontrado");
         }
 
+        // Obtener ejemplar marcado en el formulario (no necesario, solo para obtener el ejemplar)
         Optional<EjemplarDTO> ejemplarOpt = ejemplarService.obtenerEjemplarPorId(id);
         if(ejemplarOpt.isEmpty()){
             throw new RuntimeException("Ejemplar no encontrado");
@@ -77,7 +73,6 @@ public class EjemplarVentaServiceImpl implements IEjemplarVentaService{
         EjemplarVentaDTO ejemplarVenta = ejemplarVentaOpt.get();
         ejemplarVenta.setPrecio(ejemplarVentaDTO.getPrecio());
         ejemplarVenta.setEjemplar(ejemplarOpt.get());
-        //ejemplarVenta.setVenta(ejemplarVentaDTO.getVenta());
 
         EjemplarVentaModel ejemplarVentaModel = modelMapper.map(ejemplarVenta, EjemplarVentaModel.class);
         ejemplarVentaModel = ejemplarVentaRepository.save(ejemplarVentaModel);

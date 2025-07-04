@@ -4,20 +4,18 @@
 
 window.addEventListener('DOMContentLoaded', () => {    
     if(articulosVenta != null){
+        console.log("articulos venta existentes: ", articulosVenta);
         if(articulosVenta.length > 0){
             articulosVenta.forEach(art => agregarArticuloExistente(art));
         }
     }
 
-    if(idNacimientos != null){
-        if(idNacimientos.length > 0){
-            agregarNacimientosExistentes();
+    if(ejemplaresVenta != null){
+        console.log("ejemplares venta existentes: ", ejemplaresVenta);
+        if(ejemplaresVenta.length > 0){
+            agregarNacimientosUtilizados();
         }
     }
-    
-    //if(ejemplaresVenta.length > 0){
-    //    ejemplaresVenta.forEach(eje => agregarNacimientosExistentes(eje));
-    //}
 });
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -297,8 +295,8 @@ function mostrarEjemplares(nacimientoId, nacimientoIndex) {
                     name="ejemplaresVenta[${contEjemplar}].ejemplar.vendido" 
                     onchange="onCheckboxChange(this)">
 
-                <a href="/img/ejemplares/${ejemplar.nombreImagen}"  target="_blank">
-                    <img src="/img/ejemplares/${ejemplar.nombreImagen}"  
+                <a href="/img/ejemplares/${ejemplar.nombreImagen || 'default.jpg'}"  target="_blank">
+                    <img src="/img/ejemplares/${ejemplar.nombreImagen || 'default.jpg'}"  
                         class="img-thumbnail vista-previa" 
                         style="max-width: 100px; max-height: 100px; object-fit: cover;"/>
                 </a>
@@ -325,20 +323,25 @@ function mostrarEjemplares(nacimientoId, nacimientoIndex) {
 
 //*************************************************************************************************************************
 
-function agregarNacimientosExistentes() {
+function agregarNacimientosUtilizados() {
     const contenedor = document.getElementById('nacimientosContainer');
     const nacimientoIndex = contNacimiento++;
 
-    // Generamos las opciones del select en JS
+    // Generar valor por defecto del select
     let opciones = '<option value="">Selecciona un nacimiento</option>';
 
     listaNacimientos.forEach(nac => {
         let selected = '';
+
+        // Evitar nacimientos repetidos select
         if (!nacimientosSeleccionados.includes(nac.id)) {
-            if(idsNacimientosUnicos.includes(nac.id)){
+        
+            // Seleccionar nacimientos utilizados
+            if(idsNacimientosUtilizados.includes(nac.id)){
                 selected = 'selected';
             }
             
+            // Generar las opciones del select
             opciones += `<option value="${nac.id}" ${selected}>
                             ${nac.monta.macho.nombre} - ${nac.monta.hembra.nombre} (${nac.fechaNacimiento})
                         </option>`;
@@ -351,15 +354,21 @@ function agregarNacimientosExistentes() {
 
     bloque.innerHTML = `
         <div class="d-flex justify-content-between align-items-start mb-2">
+
             <select class="form-select" required 
-                onchange="guardarNacimiento(this.value); mostrarEjemplaresExistentes(this.value, ${nacimientoIndex})">
+                onchange="guardarNacimiento(this.value);
+                mostrarEjemplaresExistentes(this.value, ${nacimientoIndex})">
+                
                 ${opciones}
             </select>
 
             <button type="button" class="btn btn-danger btn-sm mx-2" 
-                onclick="eliminarNacimiento(this); agregarNacimientoEliminado(this)">
+                onclick="eliminarNacimiento(this); 
+                agregarNacimientoEliminado(this)">
+                
                 <i class="bi bi-x-lg"></i>
             </button>
+
         </div>
 
         <div id="ejemplares-${nacimientoIndex}">
@@ -369,16 +378,22 @@ function agregarNacimientosExistentes() {
 
     contenedor.appendChild(bloque);
 
-    // Obtener el valor del select, guardarlo para no repetirlo
+    // Invocar el método manualmente porque no se ejecuta por progrmación
     const select = bloque.querySelector('select');
     if (select.value) {
-        nacimientosSeleccionados(select.value);
         mostrarEjemplaresExistentes(select.value, nacimientoIndex);
+
+        // Agregar el ID del nacimiento a nacimientosSeleccionados si no está
+        const nacimientoId = parseInt(select.value);
+        if (!nacimientosSeleccionados.includes(nacimientoId)) {
+            nacimientosSeleccionados.push(nacimientoId);
+            console.log("Nacimiento agregado manualmente al final: ", nacimientoId);
+        }
     }
 }
 
 function mostrarEjemplaresExistentes(nacimientoId, nacimientoIndex) {
-    console.log("nacimientoId: ", nacimientoId);
+    console.log("id nacimiento con ejemplares vendidos: ", nacimientoId);
 
     const contenedor = document.getElementById(`ejemplares-${nacimientoIndex}`);
     contenedor.innerHTML = ''; // Limpiar contenido anterior
@@ -386,58 +401,55 @@ function mostrarEjemplaresExistentes(nacimientoId, nacimientoIndex) {
     const row = document.createElement('div');
     row.classList.add('row', 'g-3'); // g-3 para espacio entre columnas
 
-    const nacimientoDTO = listaNacimientos.find(nac => nac.id == nacimientoId);
-    if(!nacimientoDTO) return;
+    // Obtener nacimiento
+    const nacimiento = listaNacimientos.find(nac => nac.id == nacimientoId);
+    if(!nacimiento) return;
 
-    nacimientoDTO.ejemplares.forEach(ejemplar => {
-        let encontrado = false;
- 
+    // Mostrar o crear ejemplares venta del nacimiento
+    nacimiento.ejemplares.forEach(ejemplar => {
         const col = document.createElement('div');
         col.classList.add('col-md-6', 'col-lg-4'); // 2 o 3 columnas dependiendo del tamaño de pantalla
 
-        //Crear EjemplarVenta (nuevo o existente)
-        ejemplaresVenta.forEach(ejemplarVenta => {
-            // Crear ejemplar existente
-            if(ejemplarVenta.ejemplar.id == ejemplar.id){
-                col.innerHTML = `
-                    <div class="p-2 border rounded">
-                        <input type="hidden" name="ejemplaresVenta[${contEjemplar}].id" value="${ejemplarVenta.id}">
-                        <input type="hidden" name="ejemplaresVenta[${contEjemplar}].ejemplar.id" value="${ejemplarVenta.ejemplar.id}">
+        // Comprobar disponibilidad del ejemplar
+        const ejemplarVenta = ejemplaresVenta.find(ejeV => ejeV.ejemplar.id == ejemplar.id);
+        
+        // Mostrar ejemplar vendido
+        if(ejemplarVenta){
+            col.innerHTML = `
+                <div class="p-2 border rounded">
+                    <input type="hidden" name="ejemplaresVenta[${contEjemplar}].id" value="${ejemplarVenta.id}">
+                    <input type="hidden" name="ejemplaresVenta[${contEjemplar}].ejemplar.id" value="${ejemplarVenta.ejemplar.id}">
 
-                        <input class="form-check-input mb-2" 
-                            type="checkbox" 
-                            name="ejemplaresVenta[${contEjemplar}].ejemplar.vendido" 
-                            ${ejemplarVenta.ejemplar.vendido ? 'checked' : ''}
-                            onchange="onCheckboxChange(this)">
+                    <input class="form-check-input mb-2" 
+                        type="checkbox" 
+                        name="ejemplaresVenta[${contEjemplar}].ejemplar.vendido" 
+                        ${ejemplarVenta.ejemplar.vendido ? 'checked' : ''}
+                        onchange="onCheckboxChange(this)">
 
-                        <a href="/img/ejemplares/${ejemplarVenta.ejemplar.nombreImagen}"  target="_blank">
-                            <img src="/img/ejemplares/${ejemplarVenta.ejemplar.nombreImagen}"  
-                                class="img-thumbnail vista-previa" 
-                                style="max-width: 100px; max-height: 100px; object-fit: cover;"/>
-                        </a>
+                    <a href="/img/ejemplares/${ejemplarVenta.ejemplar.nombreImagen || 'default.jpg'}"  target="_blank">
+                        <img src="/img/ejemplares/${ejemplarVenta.ejemplar.nombreImagen || 'default.jpg'}"  
+                            class="img-thumbnail vista-previa" 
+                            style="max-width: 100px; max-height: 100px; object-fit: cover;"/>
+                    </a>
 
-                        <div>
-                            <p class="mb-1"><strong>Sexo:</strong> ${ejemplarVenta.ejemplar.sexo}</p>
+                    <div>
+                        <p class="mb-1"><strong>Sexo:</strong> ${ejemplarVenta.ejemplar.sexo}</p>
 
-                            <label class="form-label mb-0">Precio:</label>
-                            <input class="form-control precio-input" 
-                                type="number" 
-                                name="ejemplaresVenta[${contEjemplar}].precio" 
-                                value="${ejemplarVenta.precio}"
-                                min="0"
-                                ${!ejemplarVenta.ejemplar.vendido ? 'readonly' : ''}
-                                ${ejemplarVenta.ejemplar.vendido ? 'required' : ''}
-                                oninput="actualizarTotalVenta()">
-                        </div>
+                        <label class="form-label mb-0">Precio:</label>
+                        <input class="form-control precio-input" 
+                            type="number" 
+                            name="ejemplaresVenta[${contEjemplar}].precio" 
+                            value="${ejemplarVenta.precio ?? ''}"
+                            min="0"
+                            ${!ejemplarVenta.ejemplar.vendido ? 'readonly' : ''}
+                            ${ejemplarVenta.ejemplar.vendido ? 'required' : ''}
+                            oninput="actualizarTotalVenta()">
                     </div>
-                `;
-                
-                encontrado = true;
-            }
-        });
+                </div>
+            `;
 
-        // Crear ejemplar nuevo
-        if(!encontrado){
+        // Mostrar ejemplar disponible
+        }else{
             col.innerHTML = `
                 <div class="p-2 border rounded">
                     <input type="hidden" name="ejemplaresVenta[${contEjemplar}].ejemplar.id" value="${ejemplar.id}">
@@ -449,8 +461,8 @@ function mostrarEjemplaresExistentes(nacimientoId, nacimientoIndex) {
                         onchange="onCheckboxChange(this)"
                         ${ejemplar.vendido ? 'checked' : ''}>
 
-                    <a href="/img/ejemplares/${ejemplar.nombreImagen}"  target="_blank">
-                        <img src="/img/ejemplares/${ejemplar.nombreImagen}"  
+                    <a href="/img/ejemplares/${ejemplar.nombreImagen || 'default.jpg'}"  target="_blank">
+                        <img src="/img/ejemplares/${ejemplar.nombreImagen || 'default.jpg'}"  
                             class="img-thumbnail vista-previa" 
                             style="max-width: 100px; max-height: 100px; object-fit: cover;"/>
                     </a>
@@ -546,170 +558,3 @@ function actualizarTotalVenta() {
 
     document.querySelector('input[name="totalVenta"]').value = total.toFixed(2);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//SIN USO
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-function agregarEjemplar() {
-    const tbody = document.getElementById('ejemplaresContainer');
-
-    // Generamos las opciones del select en JS
-    let opciones = '<option value="">Selecciona un nacimiento</option>';
-
-    listaNacimientos.forEach(item => {
-        opciones += `<option value="${item.id}">
-                        ${item.monta.macho.nombre} - ${item.monta.hembra.nombre} (${item.fecha_nacimiento})
-                    </option>`;
-    });
-
-    const row = document.createElement('tr');
-    row.innerHTML = `
-        <td>
-            <div class="d-flex flex-column align-items-center">
-                <input type="file" name="ejemplares[${contEjemplar}].imagen" class="form-control" accept="image/*" 
-                    required onchange="mostrarVistaPrevia(this)">
-
-                <img class="img-thumbnail vista-previa" 
-                    style="max-width: 100px; max-height: 100px; object-fit: cover;"/>
-            </div>
-        </td>
-        <td>
-            <select name="ejemplares[${contEjemplar}].sexo" class="form-select">
-                <option value="">Selecciona una opción</option>
-                <option value="Macho">Macho</option>
-                <option value="Hembra">Hembra</option>
-            </select>
-        </td>
-        <td>
-            <input type="number" name="ejemplaresVenta[${contEjemplar}].precio" class="form-control" min="0" 
-                required oninput="actualizarTotalVenta()">
-        </td>
-        <td>
-            <select name="ejemplares[${contEjemplar}].nacimiento.id" class="form-select" required>
-                ${opciones}
-            </select>
-        </td>
-
-        <td>
-            <button type="button" class="btn btn-danger btn-sm" onclick="eliminarEjemplar(this)">
-                <i class="bi bi-x-lg"></i>
-            </button>
-        </td>
-    `;
-    
-    tbody.appendChild(row);
-    contEjemplar++;
-}
-
-function agregarEjemplarExistente(eje) {
-    const tbody = document.getElementById('ejemplaresContainer');
-
-    // Generamos las opciones del select en JS
-    let opciones = '<option value="">Selecciona un nacimiento</option>';
-
-    listaNacimientos.forEach(item => {
-        const selected = item.id === eje.nacimiento.id ? 'selected' : '';
-        opciones += `<option value="${item.id}" ${selected}>
-                        ${item.monta.macho.nombre} - ${item.monta.hembra.nombre} (${item.fecha_nacimiento})
-                    </option>`;
-    });
-
-    //<a href="/img/ejemplares/${eje.nombreImagen}" target="_blank"></a>
-
-    const row = document.createElement('tr');
-    row.innerHTML = `
-        <!-- Campo oculto para el id del ejemplar -->
-        <input type="hidden" name="ejemplares[${contEjemplar}].id" value="${eje.id}"/>
-        <input type="hidden" name="ejemplares[${contEjemplar}].nombreImagen" value="${eje.nombreImagen}"/>
-
-        <td>
-            <div class="d-flex flex-column align-items-center">
-                <input type="file" name="ejemplares[${contEjemplar}].imagen" class="form-control" accept="image/*" 
-                    onchange="mostrarVistaPrevia(this)">
-
-                <img class="img-thumbnail vista-previa" 
-                    src="/img/ejemplares/${eje.nombreImagen}" 
-                    style="max-width: 100px; max-height: 100px; object-fit: cover;"/>
-            </div>
-        </td>
-        <td>
-            <select name="ejemplares[${contEjemplar}].sexo" class="form-select">
-                <option value="">Selecciona una opción</option>
-                <option value="Macho" ${eje.sexo === 'Macho' ? 'selected' : ''}>Macho</option>
-                <option value="Hembra" ${eje.sexo === 'Hembra' ? 'selected' : ''}>Hembra</option>
-            </select>
-        </td>
-        <td>
-            <input type="number" name="ejemplares[${contEjemplar}].precio" class="form-control" value="${eje.precio}" 
-                min="0" required oninput="actualizarTotalVenta()">
-        </td>
-        <td>
-            <select name="ejemplares[${contEjemplar}].nacimiento.id" class="form-select" required>
-                ${opciones}
-            </select>
-        </td>
-
-        <td>
-            <button type="button" class="btn btn-danger btn-sm" onclick="eliminarEjemplar(this)">
-                <i class="bi bi-x-lg"></i>
-            </button>
-        </td>
-    `;
-    
-    tbody.appendChild(row);
-    contEjemplar++;
-}
-
-/*function eliminarEjemplar(boton) {
-    const row = boton.closest('tr');
-    
-    // Obtener el ID (si existe)
-    const inputId = row.querySelector('input[type="hidden"][name$=".id"]');
-    if(inputId && inputId.value){
-        // Agregar el ID del ejemplar a la lista de eliminados
-        ejemplaresEliminados.push(parseInt(inputId.value));
-        console.log("Ejemplar eliminado: "+inputId.value)
-    }
-
-    row.remove();
-    actualizarTotalVenta()
-}*/

@@ -49,10 +49,12 @@ public class VentaModel {
     @Enumerated(EnumType.STRING)
     private EstatusVenta estatus;   //PENDIENTE, APARTADO, ENTREGADO
 
-    @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
+    //@OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "venta") // Gestion manualmente
     private List<ArticuloVentaModel> articulosVenta = new ArrayList<>();
 
-    @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
+    //@OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "venta") // Gestion manualmente
     private List<EjemplarVentaModel> ejemplaresVenta = new ArrayList<>();
 
     //@OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)

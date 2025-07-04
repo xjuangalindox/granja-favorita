@@ -29,10 +29,12 @@ public class ArticuloVentaModel {
 
     // RELATIONS
     @ManyToOne
-    @JoinColumn(name = "articulo_id", nullable = false)
+    @JoinColumn(name = "articulo_id")
+    //@JoinColumn(name = "articulo_id", nullable = false)
     private ArticuloModel articulo;
 
     @ManyToOne
-    @JoinColumn(name = "venta_id", nullable = false)
+    @JoinColumn(name = "venta_id")
+    //@JoinColumn(name = "venta_id", nullable = false)
     private VentaModel venta;
 }
