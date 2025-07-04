@@ -299,8 +299,7 @@ public class VentaController {
                 for(EjemplarVentaDTO ejemplarVentaDTO : ejemplaresExistentes){
                     // Ejemplar sigue vendido
                     if(ejemplarVentaDTO.getEjemplar().isVendido()){
-                        //ejemplarVentaDTO.setVenta(venta);
-                        //ejemplarVentaService.editarEjemplarVenta(ejemplarVentaDTO.getId(), ejemplarVentaDTO);
+                        ejemplarVentaService.editarEjemplarVenta(ejemplarVentaDTO.getId(), ejemplarVentaDTO);
 
                     // Ejemplar paso a disponible
                     }else{

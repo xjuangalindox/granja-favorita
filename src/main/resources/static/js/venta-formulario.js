@@ -232,6 +232,41 @@ function onCheckboxChange(checkbox) {
 
 //*************************************************************************************************************************
 
+// 1. Función global para formatear opciones
+function formatOption(state) {
+    if (!state.id) return state.text;
+
+    const imgMacho = $(state.element).data('img-macho');
+    const imgHembra = $(state.element).data('img-hembra');
+    const name = state.text;
+
+    return $(`
+        <div class="option-wrapper">
+            <img src="${imgMacho}" class="img-select" title="Macho" />
+            <img src="${imgHembra}" class="img-select" title="Hembra" />
+            <span>&nbsp;&nbsp;${name}</span>
+        </div>
+    `);
+}
+
+$(document).ready(function() {
+    // Inicializas Select2 para selects que ya están en el HTML al cargar la página
+    $('#nacimiento-0').select2({
+        templateResult: formatOption,
+        templateSelection: formatOption,
+        minimumResultsForSearch: -1
+    });
+});
+
+function formatearFecha(fechaISO){
+    if(!fechaISO) return '';
+    return new Intl.DateTimeFormat('es-MX', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+    }).format(new Date(fechaISO));
+}
+
 function agregarNacimiento() {
     const contenedor = document.getElementById('nacimientosContainer');
     const nacimientoIndex = contNacimiento++;
@@ -241,8 +276,14 @@ function agregarNacimiento() {
 
     listaNacimientos.forEach(nac => {
         if (!nacimientosSeleccionados.includes(nac.id)) {
-            opciones += `<option value="${nac.id}">
-                            ${nac.monta.macho.nombre} - ${nac.monta.hembra.nombre} (${nac.fechaNacimiento})
+
+            const fechaFormateada = formatearFecha(nac.fechaNacimiento);
+            opciones += `<option 
+                            value="${nac.id}"
+                            data-img-macho="/img/conejos/${nac.monta.macho.nombreImagen}"
+                            data-img-hembra="/img/conejos/${nac.monta.hembra.nombreImagen}">
+
+                            ${nac.monta.macho.nombre} - ${nac.monta.hembra.nombre} (${fechaFormateada})
                         </option>`;
         }
     });
@@ -253,7 +294,7 @@ function agregarNacimiento() {
 
     bloque.innerHTML = `
         <div class="d-flex justify-content-between align-items-start mb-2">
-            <select class="form-select" required
+            <select id="nacimiento-${nacimientoIndex}" class="form-select" required
                 onchange="guardarNacimiento(this.value); 
                 mostrarEjemplares(this.value, ${nacimientoIndex})">
                 ${opciones}
@@ -270,6 +311,13 @@ function agregarNacimiento() {
     `;
 
     contenedor.appendChild(bloque);
+
+    // 3. Inicializas Select2 solo en el nuevo select creado
+    $(`#nacimiento-${nacimientoIndex}`).select2({
+        templateResult: formatOption,
+        templateSelection: formatOption,
+        minimumResultsForSearch: -1
+    });
 }
 
 function mostrarEjemplares(nacimientoId, nacimientoIndex) {
@@ -341,9 +389,14 @@ function agregarNacimientosUtilizados() {
                 selected = 'selected';
             }
             
-            // Generar las opciones del select
-            opciones += `<option value="${nac.id}" ${selected}>
-                            ${nac.monta.macho.nombre} - ${nac.monta.hembra.nombre} (${nac.fechaNacimiento})
+            const fechaFormateada = formatearFecha(nac.fechaNacimiento);
+            opciones += `<option 
+                            value="${nac.id}"
+                            ${selected}
+                            data-img-macho="/img/conejos/${nac.monta.macho.nombreImagen}"
+                            data-img-hembra="/img/conejos/${nac.monta.hembra.nombreImagen}">
+
+                            ${nac.monta.macho.nombre} - ${nac.monta.hembra.nombre} (${fechaFormateada})
                         </option>`;
         }
     });
@@ -355,7 +408,7 @@ function agregarNacimientosUtilizados() {
     bloque.innerHTML = `
         <div class="d-flex justify-content-between align-items-start mb-2">
 
-            <select class="form-select" required 
+            <select id="nacimiento-${nacimientoIndex}" class="form-select" required 
                 onchange="guardarNacimiento(this.value);
                 mostrarEjemplaresExistentes(this.value, ${nacimientoIndex})">
                 
@@ -377,6 +430,13 @@ function agregarNacimientosUtilizados() {
     `;
 
     contenedor.appendChild(bloque);
+
+    // Inicializar Select2 en el nuevo select creado
+    $(`#nacimiento-${nacimientoIndex}`).select2({
+        templateResult: formatOption,
+        templateSelection: formatOption,
+        minimumResultsForSearch: -1
+    });
 
     // Invocar el método manualmente porque no se ejecuta por progrmación
     const select = bloque.querySelector('select');

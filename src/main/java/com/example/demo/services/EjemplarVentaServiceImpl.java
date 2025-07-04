@@ -65,7 +65,7 @@ public class EjemplarVentaServiceImpl implements IEjemplarVentaService{
         }
 
         // Obtener ejemplar marcado en el formulario (no necesario, solo para obtener el ejemplar)
-        Optional<EjemplarDTO> ejemplarOpt = ejemplarService.obtenerEjemplarPorId(id);
+        Optional<EjemplarDTO> ejemplarOpt = ejemplarService.obtenerEjemplarPorId(ejemplarVentaDTO.getEjemplar().getId());
         if(ejemplarOpt.isEmpty()){
             throw new RuntimeException("Ejemplar no encontrado");
         }
